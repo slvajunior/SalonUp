@@ -1,9 +1,10 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000', // URL do seu backend Django
+  baseURL: 'http://127.0.0.1:8000/api/', // URL base do seu backend
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-export const getAgendamentos = () => api.get('/api/agendamentos/');
-export const createAgendamento = (data) => api.post('/api/agendamentos/', data);
-// Adicione outras chamadas conforme necessário
+export default api;

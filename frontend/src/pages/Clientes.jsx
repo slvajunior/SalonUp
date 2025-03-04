@@ -1,8 +1,8 @@
+// src/pages/Clientes.jsx
 import React, { useEffect, useState } from 'react';
-import { getClientes, createCliente } from './services/clientes';
-import AppRoutes from "./routes";
+import { getClientes, createCliente } from '../services/clientes';
 
-const App = () => {
+const Clientes = () => {
   const [clientes, setClientes] = useState([]);
   const [novoCliente, setNovoCliente] = useState({
     nome: '',
@@ -26,10 +26,6 @@ const App = () => {
       alert('Erro ao criar cliente');
     }
   };
-
-  function App() {
-    return <AppRoutes />;
-  }
 
   return (
     <div>
@@ -65,4 +61,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Clientes;
