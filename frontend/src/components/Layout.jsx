@@ -1,13 +1,10 @@
-// src/components/Layout.jsx
 import Sidebar from "./Sidebar";
 
-const Layout = ({ children }) => {
+export default function Layout({ children }) {
   return (
-    <div className="flex">
+    <div className="app-container">
       <Sidebar />
-      <div className="flex-1 p-6">{children}</div>
+      <main className="content">{children}</main>
     </div>
   );
-};
-
-export default Layout;
+}
