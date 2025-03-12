@@ -12,6 +12,7 @@ router.register(r'agendamentos', AgendamentoViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('admin-panel/', include('admin_panel.urls')),
     path('api/', include(router.urls)),  # Inclui as rotas da API
     path('api/token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
