@@ -1,3 +1,4 @@
+// src/components/Layout.jsx
 import Sidebar from "./Sidebar";
 
 export default function Layout({ children }) {

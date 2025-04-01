@@ -10,9 +10,11 @@ from rest_framework import viewsets
 from .models import Owner, Salao
 from .serializers import OwnerSerializer, SalaoSerializer
 from rest_framework.permissions import IsAuthenticated
-
+from clientes.models import Cliente
+from agendamentos.models import Agendamento
 from django.http import JsonResponse
 import logging
+from django.db.models import Sum
 
 
 logger = logging.getLogger(__name__)
@@ -29,8 +31,15 @@ class IsAdminUser(BasePermission):
 class AdminLoginView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
-        user = User.objects.get(username=request.data.get("username"))
+        try:
+            user = User.objects.get(username=request.data.get("username"))
+        except User.DoesNotExist:
+            return Response(
+                {"error": "Usuário não encontrado."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
+        # Verifique se o usuário é admin com o campo is_admin
         if not user.is_admin:
             return Response(
                 {"error": "Acesso negado. Apenas administradores podem entrar."},
@@ -94,10 +103,41 @@ class ProtectedAdminView(APIView):
 class OwnerViewSet(viewsets.ModelViewSet):
     queryset = Owner.objects.all()
     serializer_class = OwnerSerializer
-    permission_classes = [IsAuthenticated]  # Garantir que apenas usuários autenticados possam acessar
+    permission_classes = [
+        IsAuthenticated
+    ]  # Garantir que apenas usuários autenticados possam acessar
 
 
 class SalaoViewSet(viewsets.ModelViewSet):
     queryset = Salao.objects.all()
     serializer_class = SalaoSerializer
-    permission_classes = [IsAuthenticated]  # Garantir que apenas usuários autenticados possam acessar
+    permission_classes = [IsAuthenticated]
+
+
+class DashboardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Contagem de salões (modelo separado Salao)
+        total_saloes = Salao.objects.count()
+
+        # Contagem de clientes (modelo Cliente)
+        total_clientes = Cliente.objects.count()
+
+        # Faturamento mensal (considerando agendamentos finalizados)
+        faturamento_mensal = (
+            Agendamento.objects.filter(status="finalizado").aggregate(
+                total=Sum("valor")
+            )["total"]
+            or 0.0
+        )
+
+        data = {
+            "total_saloes": total_saloes,
+            "total_clientes": total_clientes,
+            "faturamento_mensal": float(
+                faturamento_mensal
+            ),  # Convertendo para float seguro
+        }
+
+        return Response(data, status=status.HTTP_200_OK)

@@ -1,68 +1,81 @@
-import React, { useEffect, useState } from 'react';
-import { getClientes, createCliente } from './services/clientes';
-import AppRoutes from "./routes";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import Layout from "./components/Layout";
+import Saloes from "./pages/Saloes";
+import AdicionarSalao from "./pages/AdicionarSalao";
+import SalaoDetalhes from './pages/SalaoDetalhes';
 
-const App = () => {
-  const [clientes, setClientes] = useState([]);
-  const [novoCliente, setNovoCliente] = useState({
-    nome: '',
-    email: '',
-    telefone: '',
-  });
+const PrivateRoute = ({ children }) => {
+  const isAuthenticated = !!localStorage.getItem("access_token");
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+};
 
-  useEffect(() => {
-    const fetchClientes = async () => {
-      const data = await getClientes();
-      setClientes(data);
-    };
-    fetchClientes();
-  }, []);
-
-  const handleCreateCliente = async () => {
-    try {
-      const clienteData = await createCliente(novoCliente);
-      setClientes([...clientes, clienteData]);
-    } catch (error) {
-      alert('Erro ao criar cliente');
-    }
-  };
-
-  function App() {
-    return <AppRoutes />;
-  }
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    !!localStorage.getItem("access_token")
+  );
 
   return (
-    <div>
-      <h1>Clientes</h1>
-      <input
-        type="text"
-        value={novoCliente.nome}
-        onChange={(e) => setNovoCliente({ ...novoCliente, nome: e.target.value })}
-        placeholder="Nome"
-      />
-      <input
-        type="email"
-        value={novoCliente.email}
-        onChange={(e) => setNovoCliente({ ...novoCliente, email: e.target.value })}
-        placeholder="Email"
-      />
-      <input
-        type="text"
-        value={novoCliente.telefone}
-        onChange={(e) => setNovoCliente({ ...novoCliente, telefone: e.target.value })}
-        placeholder="Telefone"
-      />
-      <button onClick={handleCreateCliente}>Criar Cliente</button>
-
-      <ul>
-        {clientes.map((cliente) => (
-          <li key={cliente.id}>
-            {cliente.nome} - {cliente.email} - {cliente.telefone}
-          </li>
-        ))}
-      </ul>
-    </div>
+    <Router>
+      <Routes>
+        {/* Redirecionamento da raiz para /login */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        
+        {/* Rota de login com callback para autenticação */}
+        <Route 
+          path="/login" 
+          element={<Login setIsAuthenticated={setIsAuthenticated} />} 
+        />
+        
+        {/* Rotas protegidas */}
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <Dashboard />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/saloes"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <Saloes />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/saloes/:id"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <SalaoDetalhes />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/saloes/novo"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <AdicionarSalao />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        
+        {/* Redirecionamento para páginas não encontradas */}
+        <Route path="*" element={<Navigate to={isAuthenticated ? "/admin" : "/login"} replace />} />
+      </Routes>
+    </Router>
   );
-};
+}
 
 export default App;
