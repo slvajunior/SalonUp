@@ -79,7 +79,7 @@ function App() {
         />
 
         <Route
-          path="/saloes/novo"
+          path="/admin/saloes/novo"
           element={
             <PrivateRoute>
               <Layout>
