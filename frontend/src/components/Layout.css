@@ -1,0 +1,14 @@
+/* src/components/Layout.css */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+    position: relative;
+  }
+  
+  .main-content {
+    flex: 1;
+    padding: 2rem;
+    margin-left: 250px; /* Deve corresponder à largura da Sidebar */
+    min-height: calc(100vh - 4rem);
+    background-color: #ffffff; /* Cor de fundo para o conteúdo */
+  }

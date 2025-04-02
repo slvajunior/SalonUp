@@ -1,11 +1,16 @@
-// src/components/Layout.jsx
-import Sidebar from "./Sidebar";
+import React from 'react';
+import Sidebar from './Sidebar';
+import './Layout.css'; // Vamos criar este arquivo depois
 
-export default function Layout({ children }) {
+const Layout = ({ children }) => {
   return (
     <div className="app-container">
       <Sidebar />
-      <main className="content">{children}</main>
+      <main className="content">
+        {children}
+      </main>
     </div>
   );
-}
+};
+
+export default Layout;

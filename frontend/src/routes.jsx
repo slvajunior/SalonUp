@@ -1,36 +1,92 @@
-//frontend/src/routes.jsx
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Home from "./pages/Dashboard";
-import Agendamentos from "./pages/Agendamentos";
-import Clientes from "./pages/Clientes";
+import { useState } from "react";
 import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
 import Layout from "./components/Layout";
+import Saloes from "./pages/Saloes";
+import AdicionarSalao from "./pages/AdicionarSalao";
+import SalaoDetalhes from "./pages/SalaoDetalhes";
+import EditarSalao from "./pages/EditarSalao"; // IMPORTANTE: Importar a página correta!
 
-// Função para verificar se o usuário está autenticado
-const isAuthenticated = () => {
-  return localStorage.getItem("access_token") !== null;
+const PrivateRoute = ({ children }) => {
+  const isAuthenticated = !!localStorage.getItem("access_token");
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
 
-const AppRoutes = () => (
-  <Router>
-    <Routes>
-      {/* Se o usuário estiver logado, vai para o dashboard. Se não, mostra a tela de login */}
-      <Route path="/" element={isAuthenticated() ? <Navigate to="/admin" /> : <Login />} />
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    !!localStorage.getItem("access_token")
+  );
 
-      {/* Página de Login */}
-      <Route path="/login" element={<Login />} />
+  return (
+    <Router>
+      <Routes>
+        {/* Redirecionamento da raiz para /login */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        
+        {/* Rota de login com callback para autenticação */}
+        <Route 
+          path="/login" 
+          element={<Login setIsAuthenticated={setIsAuthenticated} />} 
+        />
+        
+        {/* Rotas protegidas */}
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <Dashboard />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/saloes"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <Saloes />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/saloes/:id"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <SalaoDetalhes />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/saloes/editar/:id"  // 🚀 ESTA ROTA FOI ADICIONADA AQUI!
+          element={
+            <PrivateRoute>
+              <Layout>
+                <EditarSalao />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/saloes/novo"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <AdicionarSalao />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        
+        {/* Redirecionamento para páginas não encontradas */}
+        <Route path="*" element={<Navigate to={isAuthenticated ? "/admin" : "/login"} replace />} />
+      </Routes>
+    </Router>
+  );
+}
 
-      {/* Rotas protegidas */}
-      <Route path="/admin" element={isAuthenticated() ? <Layout /> : <Navigate to="/login" replace />}>
-        <Route index element={<Home />} />
-        <Route path="agendamentos" element={<Agendamentos />} />
-        <Route path="clientes" element={<Clientes />} />
-      </Route>
-
-      {/* Se tentar acessar qualquer outra rota, redireciona para login */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-  </Router>
-);
-
-export default AppRoutes;
+export default App;

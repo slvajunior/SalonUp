@@ -1,18 +1,19 @@
 /* Container principal */
 .saloes-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #f8fafc;
-    padding: 2rem;
-  }
-  
-  /* Container do conteúdo */
-  .saloes-content {
     width: 100%;
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 100px auto 2rem;
+    padding: 0 2rem;
+    box-sizing: border-box;
+  }
+  
+  /* Conteúdo */
+  .saloes-content {
+    width: 100%;
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
   }
   
   /* Cabeçalho */
@@ -20,28 +21,29 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
   }
   
-  /* Título */
   .saloes-title {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: 600;
     color: #1e293b;
+    margin: 0;
   }
   
-  /* Botão de adicionar */
+  /* Botão Adicionar */
   .add-salao-btn {
     background-color: #2563eb;
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 0.375rem;
     font-size: 0.875rem;
-    font-weight: 500;
-    transition: background-color 0.2s;
+    text-decoration: none;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    transition: background-color 0.2s;
   }
   
   .add-salao-btn:hover {
@@ -50,10 +52,7 @@
   
   /* Tabela */
   .saloes-table-container {
-    background-color: white;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+    overflow-x: auto;
   }
   
   .saloes-table {
@@ -61,7 +60,6 @@
     border-collapse: collapse;
   }
   
-  /* Cabeçalho da tabela */
   .saloes-table thead {
     background-color: #f1f5f9;
   }
@@ -75,7 +73,6 @@
     text-transform: uppercase;
   }
   
-  /* Linhas da tabela */
   .saloes-table tbody tr {
     border-bottom: 1px solid #e2e8f0;
   }
@@ -88,7 +85,6 @@
     background-color: #f1f5f9;
   }
   
-  /* Células */
   .saloes-table td {
     padding: 1rem;
     font-size: 0.875rem;
@@ -117,13 +113,13 @@
   /* Ações */
   .actions {
     display: flex;
-    justify-content: flex-end;
     gap: 1rem;
   }
   
   .action-link {
     color: #2563eb;
     font-weight: 500;
+    text-decoration: none;
     transition: color 0.2s;
   }
   
@@ -132,12 +128,26 @@
     text-decoration: underline;
   }
   
-  /* Loading */
+  .delete-button {
+    background: none;
+    border: none;
+    color: #dc2626;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0;
+    font-size: 0.875rem;
+  }
+  
+  .delete-button:hover {
+    text-decoration: underline;
+  }
+  
+  /* Loading e Erros */
   .loading-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 300px;
+    padding: 2rem;
   }
   
   .loading-spinner {
@@ -147,6 +157,25 @@
     border-top-color: #2563eb;
     border-radius: 50%;
     animation: spin 1s linear infinite;
+  }
+  
+  .error-container {
+    text-align: center;
+    padding: 2rem;
+  }
+  
+  .error-message {
+    color: #dc2626;
+    margin-bottom: 1rem;
+  }
+  
+  .retry-button {
+    background-color: #2563eb;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
   }
   
   @keyframes spin {

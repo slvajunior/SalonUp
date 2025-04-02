@@ -1,103 +1,125 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import "./SalaoDetalhes.css"; // CSS específico para esta página
 
-const AdicionarSalao = () => {
-  const [salao, setSalao] = useState({
-    nome: "",
-    cnpj: "",
-    endereco: "",
-    status: "ativo",
-  });
-  const navigate = useNavigate();
+const SalaoDetalhes = () => {
+  const { id } = useParams();
+  const [salao, setSalao] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setSalao(prev => ({ ...prev, [name]: value }));
-  };
+  useEffect(() => {
+    const fetchSalao = async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+          window.location.href = "/login";
+          return;
+        }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch("http://127.0.0.1:8000/admin-panel/api/saloes/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-        body: JSON.stringify(salao),
-      });
+        const response = await fetch(
+          `http://127.0.0.1:8000/admin-panel/api/saloes/${id}/`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      if (response.ok) {
-        navigate("/saloes");
-      } else {
-        console.error("Erro ao adicionar salão:", await response.json());
+        if (response.status === 401) {
+          localStorage.removeItem("access_token");
+          window.location.href = "/login";
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error("Salão não encontrado");
+        }
+
+        const data = await response.json();
+        setSalao(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Erro ao adicionar salão:", error);
-    }
-  };
+    };
+
+    fetchSalao();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="salao-detalhes-loading">
+        <div className="loading-spinner"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="salao-detalhes-error">
+        <p>{error}</p>
+        <Link to="/saloes" className="back-button">
+          Voltar para a lista
+        </Link>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Adicionar Novo Salão</h2>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nome do Salão</label>
-            <input
-              type="text"
-              name="nome"
-              value={salao.nome}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
+    <div className="salao-detalhes-container">
+      <div className="salao-detalhes-card">
+        <div className="salao-detalhes-header">
+          <h1>{salao.nome}</h1>
+          <span className={`status-badge ${salao.status === 'ativo' ? 'ativo' : 'inativo'}`}>
+            {salao.status}
+          </span>
+        </div>
+
+        <div className="salao-detalhes-content">
+          <div className="detail-section">
+            <h2>Informações Básicas</h2>
+            <div className="detail-row">
+              <span className="detail-label">CNPJ:</span>
+              <span className="detail-value">{salao.cnpj}</span>
+            </div>
+            <div className="detail-row">
+              <span className="detail-label">Endereço:</span>
+              <span className="detail-value">{salao.endereco}</span>
+            </div>
+            <div className="detail-row">
+              <span className="detail-label">Data de Cadastro:</span>
+              <span className="detail-value">
+                {new Date(salao.data_cadastro).toLocaleDateString()}
+              </span>
+            </div>
           </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">CNPJ</label>
-            <input
-              type="text"
-              name="cnpj"
-              value={salao.cnpj}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
+
+          <div className="detail-section">
+            <h2>Contato</h2>
+            <div className="detail-row">
+              <span className="detail-label">Telefone:</span>
+              <span className="detail-value">{salao.telefone || 'Não informado'}</span>
+            </div>
+            <div className="detail-row">
+              <span className="detail-label">Email:</span>
+              <span className="detail-value">{salao.email || 'Não informado'}</span>
+            </div>
           </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Endereço</label>
-            <input
-              type="text"
-              name="endereco"
-              value={salao.endereco}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
+
+          <div className="salao-detalhes-actions">
+            <Link to="/saloes" className="back-button">
+              Voltar
+            </Link>
+            <Link to={`/saloes/editar/${id}`} className="edit-button">
+              Editar Salão
+            </Link>
           </div>
-          
-          <div className="flex space-x-4 pt-4">
-            <button
-              type="button"
-              onClick={() => navigate("/saloes")}
-              className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-md transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition-colors"
-            >
-              Salvar
-            </button>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
   );
 };
 
-export default AdicionarSalao;
+export default SalaoDetalhes;
