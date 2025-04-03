@@ -12,16 +12,22 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 SIMPLE_JWT = {
-    'ALGORITHM': 'HS256',  # Você pode escolher outro algoritmo se preferir
-    'SIGNING_KEY': os.getenv('JWT_SECRET_KEY'),
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=7),  # O usuário fica logado por 7 dias
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),  # Pode continuar logado por 30 dias
+    'ROTATE_REFRESH_TOKENS': True,  # Gera novo refresh token a cada uso
+    'BLACKLIST_AFTER_ROTATION': True,  # Invalida o refresh antigo para segurança
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': os.getenv("SECRET_KEY"),
 }
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
+    ],
+
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
 }
 
 AUTHENTICATION_BACKENDS = [
@@ -35,11 +41,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_extensions",
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
+    "rest_framework.authtoken",
     "corsheaders",
     "clientes",
+    "core",
     "agendamentos",
     "admin_panel",
 ]
@@ -56,9 +65,12 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
 ]
 
+
 CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = "salonup_backend.urls"
+
+AUTH_USER_MODEL = 'admin_panel.Owner'
 
 TEMPLATES = [
     {
@@ -114,7 +126,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "pt-br"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "America/Sao_Paulo"
 
 USE_I18N = True
 

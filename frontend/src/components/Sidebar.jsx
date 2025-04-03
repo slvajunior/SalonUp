@@ -12,49 +12,55 @@ const Sidebar = () => {
 
   return (
     <div className="sidebar-horizontal">
-      {/* Logo/Cabeçalho */}
+      {/* Logo com vibe tech */}
       <div className="sidebar-brand">
-        <h2 className="sidebar-title">SalonUp PRO</h2>
-        <p className="sidebar-subtitle">Painel Administrativo</p>
+        <div className="code-brackets">
+          <h2 className="sidebar-title">SalonUp<span className="dev-highlight"> PRO</span></h2>
+        </div>
       </div>
 
-      {/* Menu */}
+      {/* Menu estilo IDE/terminal */}
       <nav className="sidebar-nav">
         <ul className="sidebar-menu">
-          <li>
+          <li className="menu-item">
             <Link to="/admin" className="sidebar-link">
-              <svg className="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-              Dashboard
+              <span className="icon-code">{'//'}</span>
+              <span className="menu-text">Dashboard</span>
+              <span className="shortcut">Ctrl+D</span>
             </Link>
           </li>
-          <li>
+          <li className="menu-item">
             <Link to="/saloes" className="sidebar-link">
-              <svg className="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5m-4 0h4" />
-              </svg>
-              Salões
+              <span className="icon-code">{'<>'}</span>
+              <span className="menu-text">Salões</span>
+              <span className="shortcut">Ctrl+S</span>
             </Link>
           </li>
-          <li>
+          <li className="menu-item">
             <Link to="/financeiro" className="sidebar-link">
-              <svg className="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Financeiro
+              <span className="icon-code">{'$'}</span>
+              <span className="menu-text">Financeiro</span>
+              <span className="shortcut">Ctrl+F</span>
+            </Link>
+          </li>
+          <li className="menu-item">
+            <Link to="/config" className="sidebar-link">
+              <span className="icon-code">{'{}'}</span>
+              <span className="menu-text">Config</span>
+              <span className="shortcut">Ctrl+,</span>
             </Link>
           </li>
         </ul>
       </nav>
 
-      {/* Logout */}
-      <div className="sidebar-logout">
+      {/* Área de status/logout */}
+      <div className="status-bar">
+        <div className="connection-status">
+          <span className="status-indicator"></span>
+          <span>master@salonup</span>
+        </div>
         <button onClick={handleLogout} className="logout-btn">
-          <svg className="logout-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-          Sair
+          <span className="logout-icon">Exit ()</span>
         </button>
       </div>
     </div>

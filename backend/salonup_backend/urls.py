@@ -7,6 +7,7 @@ from clientes.views import ClienteViewSet
 from rest_framework_simplejwt import views as jwt_views
 from admin_panel.views import SalaoViewSet
 
+
 # Criamos um router para registrar os endpoints automaticamente
 router = DefaultRouter()
 router.register(r'clientes', ClienteViewSet)

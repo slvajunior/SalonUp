@@ -1,14 +1,21 @@
 /* src/components/Layout.css */
+
+body, html {
+  background: #2d372d;
+  margin: 0 0 100px;
+  overflow-y: hidden;  
+}
+
 .app-container {
-    display: flex;
-    min-height: 100vh;
-    position: relative;
-  }
-  
-  .main-content {
-    flex: 1;
-    padding: 2rem;
-    margin-left: 250px; /* Deve corresponder à largura da Sidebar */
-    min-height: calc(100vh - 4rem);
-    background-color: #ffffff; /* Cor de fundo para o conteúdo */
-  }
+  display: flex;
+  min-height: 50vh;
+  position: relative;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  margin-left: 250px; /* Deve corresponder à largura da Sidebar */
+  min-height: calc(100vh - 4rem);
+  background-color: #ffffff; /* Cor de fundo para o conteúdo */
+}

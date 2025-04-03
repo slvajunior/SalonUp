@@ -1,185 +1,248 @@
 /* Container principal */
-.saloes-container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 100px auto 2rem;
-    padding: 0 2rem;
-    box-sizing: border-box;
-  }
+
+/* =====================================
+   Variáveis
+   ===================================== */
+
+   :root {
+
+    /* Tipografia */
+     --font-family-base: 'Helvetica', Arial, sans-serif;
+     --font-family-logo: 'Poppins', sans-serif;
+     --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+     /* Defaults color */
+     --primary-color: #6200ee;
+     --green-color: #4CAF50;
+     --red-color: #f02849;
+     --blue-color: #2364a4;
+     --accent-color: #e5e9e9;
+
+     --color-blue: #0866ff;
+     --button-media-color: #f2f4f7;
+     --button-media-hover-color: #e5e9e9;
+     --button-post-control: #f8f8f8;
+     --background-color: #f2f4f7;
+     --text-color: #333333;
+     --border-radius: 8px;
+     --transition-time: 0.3s;
+     --black-color: #111;
+     --color-primary: #f2f4f7;
+     --color-secondary: #FFF;
+     --border-color-blue: var(--color-blue);
+     --border-color-blue-hover: #0872ff;
+     --blue-hover: #023b86; 
+   }
+
+/* Container principal */
+div.saloes-container {
+  /* Mantém todas as propriedades anteriores */
+  position: relative;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0; /* Remove a margem anterior */
+
+  margin-top: 200px;
+  width: 90%;
+  padding: 10px auto 100px;
+}
+
+/* Conteúdo */
+.saloes-content {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  height: 300px;
+
+  height: 50vh;
+  overflow-y: hidden;
   
-  /* Conteúdo */
-  .saloes-content {
-    width: 100%;
-    background-color: white;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-  }
+}
+
+/* Cabeçalho */
+.saloes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  background-color: #111827;
+}
+
+.saloes-title {
+  font-size: 1.5rem;
+  font-weight: 100;
+  color: rgb(2, 248, 2);
+  margin: 0;
+
+  font-family: var(--font-family-logo);
+  text-transform: uppercase;
+}
+
+/* Botão Adicionar */
+.add-salao-btn {
+  background-color: rgb(2, 248, 2);
+  color: #2d372d;
+  padding: 0.5rem 1rem;
+  border-radius: 2px;
+  font-size: 0.875rem;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.add-salao-btn:hover {
+  background-color: rgb(2, 248, 2);
+  color: #2d372d;
+}
+
+/* Tabela */
+div.saloes-table-container {
+  overflow-x: auto;
+  max-height: 300px;
+  position: relative; /* Adicionado para contexto de posicionamento */
+}
+
+.saloes-table {
+  width: 100%;
+  border-collapse: collapse;
+
+}
+
+.saloes-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10; /* Garante que o cabeçalho fique acima do conteúdo */
+  background-color: #f1f5f9;
+}
+
+.saloes-table th {
+  padding: 1rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #111;
+  text-transform: uppercase;
+  position: sticky;
+  top: 0;
+  background-color: #9da9b9; /* Mesma cor do thead para cobrir o conteúdo */
+
+}
+
+
+
+.saloes-table tbody tr {
+  border-bottom: 1px solid #e2e8f0;
   
-  /* Cabeçalho */
-  .saloes-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem;
-    border-bottom: 1px solid #e2e8f0;
+}
+
+.saloes-table tbody tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.saloes-table tbody tr:hover {
+  background-color: #f1f5f9;
+}
+
+.saloes-table td {
+  padding: 1rem;
+  font-size: 0.875rem;
+  color: #334155;
+}
+
+/* Status */
+.status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-ativo {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.status-inativo {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* Ações */
+.actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.action-link {
+  color: #2563eb;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.action-link:hover {
+  color: #1e40af;
+  text-decoration: underline;
+}
+
+.delete-button {
+  background: none;
+  border: none;
+  color: #dc2626;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.875rem;
+}
+
+.delete-button:hover {
+  text-decoration: underline;
+}
+
+/* Loading e Erros */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.loading-spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 0.25rem solid #e2e8f0;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.error-container {
+  text-align: center;
+  padding: 2rem;
+}
+
+.error-message {
+  color: #dc2626;
+  margin-bottom: 1rem;
+}
+
+.retry-button {
+  background-color: #2563eb;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
-  
-  .saloes-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #1e293b;
-    margin: 0;
-  }
-  
-  /* Botão Adicionar */
-  .add-salao-btn {
-    background-color: #2563eb;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: background-color 0.2s;
-  }
-  
-  .add-salao-btn:hover {
-    background-color: #1d4ed8;
-  }
-  
-  /* Tabela */
-  .saloes-table-container {
-    overflow-x: auto;
-  }
-  
-  .saloes-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .saloes-table thead {
-    background-color: #f1f5f9;
-  }
-  
-  .saloes-table th {
-    padding: 1rem;
-    text-align: left;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #64748b;
-    text-transform: uppercase;
-  }
-  
-  .saloes-table tbody tr {
-    border-bottom: 1px solid #e2e8f0;
-  }
-  
-  .saloes-table tbody tr:nth-child(even) {
-    background-color: #f8fafc;
-  }
-  
-  .saloes-table tbody tr:hover {
-    background-color: #f1f5f9;
-  }
-  
-  .saloes-table td {
-    padding: 1rem;
-    font-size: 0.875rem;
-    color: #334155;
-  }
-  
-  /* Status */
-  .status {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-  
-  .status-ativo {
-    background-color: #dcfce7;
-    color: #166534;
-  }
-  
-  .status-inativo {
-    background-color: #fee2e2;
-    color: #991b1b;
-  }
-  
-  /* Ações */
-  .actions {
-    display: flex;
-    gap: 1rem;
-  }
-  
-  .action-link {
-    color: #2563eb;
-    font-weight: 500;
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-  
-  .action-link:hover {
-    color: #1e40af;
-    text-decoration: underline;
-  }
-  
-  .delete-button {
-    background: none;
-    border: none;
-    color: #dc2626;
-    font-weight: 500;
-    cursor: pointer;
-    padding: 0;
-    font-size: 0.875rem;
-  }
-  
-  .delete-button:hover {
-    text-decoration: underline;
-  }
-  
-  /* Loading e Erros */
-  .loading-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 2rem;
-  }
-  
-  .loading-spinner {
-    width: 3rem;
-    height: 3rem;
-    border: 0.25rem solid #e2e8f0;
-    border-top-color: #2563eb;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-  
-  .error-container {
-    text-align: center;
-    padding: 2rem;
-  }
-  
-  .error-message {
-    color: #dc2626;
-    margin-bottom: 1rem;
-  }
-  
-  .retry-button {
-    background-color: #2563eb;
-    color: white;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 0.375rem;
-    cursor: pointer;
-  }
-  
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
+}

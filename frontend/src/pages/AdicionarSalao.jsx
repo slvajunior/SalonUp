@@ -1,31 +1,40 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./AdicionarSalao.css";
 
 const AdicionarSalao = () => {
   const [salao, setSalao] = useState({
     nome: "",
     cnpj: "",
     endereco: "",
+    telefone: "",
     status: "ativo",
   });
+
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setSalao(prev => ({ ...prev, [name]: value }));
+    if (name === "telefone" && !/^\d*$/.test(value)) return;
+    setSalao((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Payload enviado:", salao); // ✅ Agora está correto
+
     try {
-      const response = await fetch("http://127.0.0.1:8000/admin-panel/api/saloes/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-        body: JSON.stringify(salao),
-      });
+      const response = await fetch(
+        "http://127.0.0.1:8000/admin-panel/api/saloes/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+          body: JSON.stringify(salao),
+        }
+      );
 
       if (response.ok) {
         navigate("/saloes");
@@ -40,11 +49,15 @@ const AdicionarSalao = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
       <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Adicionar Novo Salão</h2>
-        
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+          Adicionar Novo Salão
+        </h2>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nome do Salão</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Nome do Salão
+            </label>
             <input
               type="text"
               name="nome"
@@ -54,9 +67,11 @@ const AdicionarSalao = () => {
               required
             />
           </div>
-          
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">CNPJ</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              CNPJ
+            </label>
             <input
               type="text"
               name="cnpj"
@@ -66,9 +81,11 @@ const AdicionarSalao = () => {
               required
             />
           </div>
-          
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Endereço</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Endereço
+            </label>
             <input
               type="text"
               name="endereco"
@@ -78,7 +95,21 @@ const AdicionarSalao = () => {
               required
             />
           </div>
-          
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Telefone
+            </label>
+            <input
+              type="text"
+              name="telefone"
+              value={salao.telefone}
+              onChange={handleInputChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+
           <div className="flex space-x-4 pt-4">
             <button
               type="button"

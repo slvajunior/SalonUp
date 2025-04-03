@@ -1,17 +1,18 @@
+# admin_panel/models.py
 from django.core.exceptions import ValidationError
-from django.contrib.auth.models import (
-    AbstractBaseUser,
-    BaseUserManager,
-    # PermissionsMixin,
-    # Group,
-    # Permission,
-)
-
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.conf import settings
+from django.utils import timezone
 from django.db import models
+from agendamentos.models import Agendamento
+from clientes.models import Cliente
+
+
+cli_ = Cliente.objects.all()
 
 
 class OwnerManager(BaseUserManager):
-    use_in_migrations = True  # 🔥 Isso ajuda o Django a reconhecer o Manager!
+    use_in_migrations = True
 
     def create_user(self, username, email, password=None):
         if not username:
@@ -28,6 +29,7 @@ class OwnerManager(BaseUserManager):
         user = self.create_user(username, email, password)
         user.is_admin = True
         user.is_master = True
+        user.is_superuser = True  # Garante compatibilidade com o Django Admin
         user.save(using=self._db)
         return user
 
@@ -39,6 +41,7 @@ class Owner(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     is_master = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)  # Django Admin compatível
 
     objects = OwnerManager()
 
@@ -48,27 +51,66 @@ class Owner(AbstractBaseUser):
     def __str__(self):
         return self.username
 
+    def clean(self):
+        """Garante que só exista um `is_master=True` no banco"""
+        if self.is_master and Owner.objects.filter(is_master=True).exclude(pk=self.pk).exists():
+            raise ValidationError("Já existe um superusuário. Apenas um é permitido.")
+
     def save(self, *args, **kwargs):
-        if self.is_master:
-            # Se o usuário já existe (tem um `id` no banco), ignora a verificação
-            if not self.pk and Owner.objects.filter(is_master=True).exists():
-                raise ValidationError(
-                    "Já existe um superusuário. Apenas um é permitido."
-                )
+        self.clean()
         super().save(*args, **kwargs)
 
 
 class Salao(models.Model):
-    nome = models.CharField(max_length=255)
-    proprietario = models.ForeignKey(Owner, on_delete=models.CASCADE, null=True, blank=True)  # Allowing null and blank
+    STATUS_CHOICES = [
+        ("ativo", "Ativo"),
+        ("inativo", "Inativo"),
+    ]
+
+    nome = models.CharField(max_length=100)
     cnpj = models.CharField(max_length=18, unique=True, blank=True, null=True)
-    endereco = models.TextField(blank=True, null=True)
-    status = models.CharField(
-        max_length=10,
-        choices=[("ativo", "Ativo"), ("inativo", "Inativo")],
-        default="ativo",
+    endereco = models.TextField()
+    cidade = models.CharField(max_length=100)
+    estado = models.CharField(max_length=2)
+    telefone = models.CharField(max_length=15)
+    email = models.EmailField()
+    status = models.CharField(max_length=7, choices=STATUS_CHOICES, default="ativo")
+    data_cadastro = models.DateTimeField(default=timezone.now)
+
+    proprietario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="saloes"
     )
-    data_cadastro = models.DateTimeField(auto_now_add=True)
+
+    clientes = models.ManyToManyField("clientes.Cliente", related_name="saloes_cliente")
 
     def __str__(self):
-        return f"{self.nome} ({self.proprietario.name if self.proprietario else 'Sem Proprietário'})"
+        return self.nome
+
+
+class Pagamento(models.Model):
+    METODO_PAGAMENTO_CHOICES = [
+        ("pix", "PIX"),
+        ("cartao", "Cartão de Crédito/Débito"),
+        ("dinheiro", "Dinheiro"),
+        ("boleto", "Boleto"),
+    ]
+
+    agendamento = models.ForeignKey(Agendamento, on_delete=models.CASCADE)
+    salao = models.ForeignKey(Salao, on_delete=models.CASCADE)  # Relacionamento direto com Salao
+    valor = models.DecimalField(max_digits=10, decimal_places=2)
+    metodo = models.CharField(max_length=50, choices=METODO_PAGAMENTO_CHOICES)
+    data_pagamento = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Pagamento #{self.id}"
+
+
+class Servico(models.Model):
+    nome = models.CharField(max_length=255)
+    descricao = models.TextField(blank=True, null=True)
+    valor_padrao = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return self.nome

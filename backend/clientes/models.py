@@ -1,23 +1,15 @@
-# apps/clientes/models.py
+# backend/clientes/models.py
+
 from django.db import models
-from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class Cliente(models.Model):
-    nome = models.CharField(max_length=255)
-    email = models.EmailField(unique=True)
-    telefone = models.CharField(max_length=15, blank=True, null=True)
-    criado_em = models.DateTimeField(auto_now_add=True)
-    is_salao = models.BooleanField(default=False)
+    nome = models.CharField(max_length=100)
+    telefone = models.CharField(max_length=15, null=False, default="00000000000000")
+    email = models.EmailField()
+    data_cadastro = models.DateTimeField(default=timezone.now)
+    salao = models.ForeignKey("admin_panel.Salao", on_delete=models.CASCADE, default=1)
 
     def __str__(self):
         return self.nome
-
-
-class Salao(models.Model):
-    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-    nome = models.CharField(max_length=100)
-    cnpj = models.CharField(max_length=18, unique=True)
-    endereco = models.TextField()
-    status = models.CharField(max_length=10, default='ativo')
-    # outros campos específicos de salão
