@@ -280,6 +280,11 @@ table tr:hover {
   color: #991b1b;
 }
 
+.status-badge.suspenso {
+  background-color: #f8f1e0;
+  color: #fcb501;
+}
+
 /* Lista de atividades */
 .activities-list {
   max-height: 350px;

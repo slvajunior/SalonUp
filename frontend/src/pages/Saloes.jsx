@@ -172,7 +172,11 @@ const Saloes = () => {
                       className={`status ${
                         salao.status === "ativo"
                           ? "status-ativo"
-                          : "status-inativo"
+                          : salao.status === "inativo"
+                          ? "status-inativo"
+                          : salao.status === "suspenso"
+                          ? "status-suspenso"
+                          : ""
                       }`}
                     >
                       {salao.status}
@@ -180,10 +184,7 @@ const Saloes = () => {
                   </td>
                   {/* Dentro do mapeamento dos salões */}
                   <td className="actions">
-                    <Link
-                      to={`/saloes/${salao.id}`}
-                      className="action-link"
-                    >
+                    <Link to={`/saloes/${salao.id}`} className="action-link">
                       Detalhes
                     </Link>
                     <Link

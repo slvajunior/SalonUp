@@ -170,6 +170,11 @@ div.saloes-table-container::-webkit-scrollbar {
   color: #991b1b;
 }
 
+.status-suspenso {
+  background-color: #f8f1e0;
+  color: #fab402;
+}
+
 /* Ações */
 .actions {
   display: flex;
