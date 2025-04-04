@@ -1,0 +1,308 @@
+/* pages/Login.css */
+
+.login-window {
+  width: 393px;
+}
+
+.code-editor.login-window {
+  /* Estilos base (iguais ao SalaoForm.css) */
+  width: 450px;
+  max-width: 90vw;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+  font-family: "JetBrains Mono", monospace;
+}
+
+/* Estilos para o teclado virtual */
+.keyboard-toggle {
+  background: none;
+  border: none;
+  color: #4fc3f7;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.8rem;
+  margin-top: 5px;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 3px;
+}
+
+.keyboard-toggle:hover {
+  background-color: rgba(79, 195, 247, 0.1);
+}
+
+/* Estilos para o teclado virtual */
+.virtual-keyboard {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: rgba(30, 30, 30, 0.8);
+  border-radius: 6px;
+  border: 1px solid #737272;
+}
+
+.keyboard-keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.keyboard-key {
+  padding: 8px 12px;
+  background-color: #121212;
+  color: #e0e0e0;
+  border: 1px solid #737272;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: "JetBrains Mono", monospace;
+  transition: all 0.2s;
+}
+
+.keyboard-key:hover {
+  background-color: #4fc3f7;
+  color: #121212;
+}
+
+.keyboard-close {
+  padding: 8px 16px;
+  background-color: #ff5252;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: "JetBrains Mono", monospace;
+  margin-top: 10px;
+}
+
+.keyboard-close:hover {
+  background-color: #ff3333;
+}
+
+/* Estilo para inputs quando o teclado virtual está ativo */
+.code-input[readonly] {
+  background-color: rgba(30, 30, 30, 0.3);
+  cursor: pointer;
+}
+
+/* Estilo para inputs quando o teclado virtual está ativo */
+.code-input[readonly] {
+  background-color: rgba(30, 30, 30, 0.3);
+  cursor: pointer;
+}
+
+.code-editor.dragging {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+  transition: none;
+}
+
+.editor-header {
+  background-color: #121212;
+  padding: 8px 15px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #737272;
+  cursor: grab;
+  user-select: none;
+}
+
+.editor-header:active {
+  cursor: grabbing;
+}
+
+.window-controls {
+  display: flex;
+  gap: 8px;
+  margin-right: 15px;
+}
+
+.control {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.control:hover {
+  transform: scale(1.1);
+}
+
+.control.close {
+  background-color: #ff5f56;
+}
+
+.control.minimize {
+  background-color: #ffbd2e;
+}
+
+.control.expand {
+  background-color: #27c93f;
+}
+
+.editor-title {
+  font-size: 0.85rem;
+  color: #e0e0e0;
+  opacity: 0.8;
+}
+
+.editor-body {
+  background-color: #121212;
+  padding: 25px;
+  border-left: 1px solid #737272;
+  border-right: 1px solid #737272;
+}
+
+.code-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.input-label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.label-comment {
+  font-size: 0.8rem;
+  color: #ffa000;
+  opacity: 0.7;
+}
+
+.code-input {
+  background-color: rgba(30, 30, 30, 0.5);
+  border: 1px solid #737272;
+  color: #e0e0e0;
+  padding: 10px 15px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.code-input:focus {
+  outline: none;
+  border-color: #4fc3f7;
+  box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.2);
+}
+
+.error-message {
+  color: #ff5252;
+  font-size: 0.85rem;
+  padding: 8px;
+  background-color: rgba(255, 82, 82, 0.1);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.error-icon {
+  font-size: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.save-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  background-color: #4fc3f7;
+  color: #121212;
+  font-weight: 500;
+}
+
+.save-button:hover {
+  background-color: #0288d1;
+}
+
+.save-button:disabled {
+  background-color: #737272;
+  cursor: not-allowed;
+}
+
+.button-icon {
+  color: #ffa000;
+}
+
+.editor-footer {
+  background-color: #121212;
+  padding: 8px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #737272;
+  font-size: 0.8rem;
+  color: #ffa000;
+}
+
+.cursor-indicator {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Efeito de terminal no fundo */
+body {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  font-family: "JetBrains Mono", monospace;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(rgba(30, 30, 30, 0.8), rgba(30, 30, 30, 0.8)),
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><text x="10" y="20" font-family="monospace" font-size="10" fill="%23ffa000" opacity="0.1">$ npm start</text><text x="10" y="40" font-family="monospace" font-size="10" fill="%234fc3f7" opacity="0.1">> salonUp PRO</text><text x="10" y="60" font-family="monospace" font-size="10" fill="%2369f0ae" opacity="0.1">// Loading...</text></svg>');
+  z-index: -1;
+}
+body::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(rgba(30, 30, 30, 0.8), rgba(30, 30, 30, 0.8)),
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><text x="10" y="20" font-family="monospace" font-size="10" fill="%23ffa000" opacity="0.1">$ npm start</text><text x="10" y="40" font-family="monospace" font-size="10" fill="%234fc3f7" opacity="0.1">> salonUp PRO</text><text x="10" y="60" font-family="monospace" font-size="10" fill="%2369f0ae" opacity="0.1">// Loading...</text></svg>');
+  z-index: -2;
+  animation: noise-anim 1s infinite steps(5);
+}
