@@ -1,3 +1,5 @@
+//pages/SalaoDetalhes.jsx
+
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import "./SalaoDetalhes.css"; // CSS específico para esta página

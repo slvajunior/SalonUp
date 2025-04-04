@@ -7,7 +7,10 @@ const AdicionarSalao = () => {
     nome: "",
     cnpj: "",
     endereco: "",
+    cidade: "",
+    estado: "",
     telefone: "",
+    email: "",
     status: "ativo",
   });
 
@@ -62,6 +65,47 @@ const AdicionarSalao = () => {
               type="text"
               name="nome"
               value={salao.nome}
+              onChange={handleInputChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Cidade
+            </label>
+            <input
+              type="text"
+              name="cidade"
+              value={salao.cidade}
+              onChange={handleInputChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Estado
+            </label>
+            <input
+              type="text"
+              name="estado"
+              value={salao.estado}
+              onChange={handleInputChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={salao.email}
               onChange={handleInputChange}
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               required

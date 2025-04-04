@@ -1,64 +1,43 @@
 /* Container principal */
 
-/* =====================================
-   Variáveis
-   ===================================== */
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css");
 
-   :root {
+:root {
+  --bg-dark: #1e1e1e;
+  --bg-darker: #121212;
+  --primary: #4fc3f7;
+  --primary-dark: #0288d1;
+  --text-light: #e0e0e0;
+  --text-lighter: #ffffff;
+  --accent: #ffa000;
+  --success: #69f0ae;
+  --border: #737272;
+  --sidebar: #111827;
 
-    /* Tipografia */
-     --font-family-base: 'Helvetica', Arial, sans-serif;
-     --font-family-logo: 'Poppins', sans-serif;
-     --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-
-     /* Defaults color */
-     --primary-color: #6200ee;
-     --green-color: #4CAF50;
-     --red-color: #f02849;
-     --blue-color: #2364a4;
-     --accent-color: #e5e9e9;
-
-     --color-blue: #0866ff;
-     --button-media-color: #f2f4f7;
-     --button-media-hover-color: #e5e9e9;
-     --button-post-control: #f8f8f8;
-     --background-color: #f2f4f7;
-     --text-color: #333333;
-     --border-radius: 8px;
-     --transition-time: 0.3s;
-     --black-color: #111;
-     --color-primary: #f2f4f7;
-     --color-secondary: #FFF;
-     --border-color-blue: var(--color-blue);
-     --border-color-blue-hover: #0872ff;
-     --blue-hover: #023b86; 
-   }
+  /* Tipografia JetBrains Mono */
+  --font-code: "JetBrains Mono", monospace;
+}
 
 /* Container principal */
 div.saloes-container {
   /* Mantém todas as propriedades anteriores */
   position: relative;
-  top: 20%;
+  top: 10%;
   left: 50%;
   transform: translate(-50%, -50%);
   margin: 0; /* Remove a margem anterior */
 
-  margin-top: 200px;
-  width: 90%;
+  margin-top: 258px;
+  width: 100%;
   padding: 10px auto 100px;
 }
 
 /* Conteúdo */
 .saloes-content {
   background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  height: 300px;
-
-  height: 50vh;
+  height: 70vh;
   overflow-y: hidden;
-  
 }
 
 /* Cabeçalho */
@@ -66,25 +45,25 @@ div.saloes-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  background-color: #111827;
+  padding: 0 1rem 0;
+  background-color: #292837;
+  height: 100px;
+  margin: 0;
 }
 
 .saloes-title {
   font-size: 1.5rem;
   font-weight: 100;
-  color: rgb(2, 248, 2);
+  color: var(--border);
   margin: 0;
 
-  font-family: var(--font-family-logo);
-  text-transform: uppercase;
+  font-family: var(--font-code);
 }
 
 /* Botão Adicionar */
 .add-salao-btn {
-  background-color: rgb(2, 248, 2);
-  color: #2d372d;
+  background-color: #c6cbd516;
+  color: var(--border);
   padding: 0.5rem 1rem;
   border-radius: 2px;
   font-size: 0.875rem;
@@ -93,24 +72,44 @@ div.saloes-container {
   align-items: center;
   gap: 0.5rem;
   transition: background-color 0.2s;
+  font-family: var(--font-code);
 }
 
 .add-salao-btn:hover {
-  background-color: rgb(2, 248, 2);
-  color: #2d372d;
+  background-color: rgba(79, 194, 247, 0.133);
+  color: var(--primary);
+}
+
+.add-salao-btn:active {
+  background-color: rgba(79, 195, 247, 0.2);
+  color: var(--primary);
+}
+
+.h-5.w-5 {
+  color: var(--accent);
 }
 
 /* Tabela */
 div.saloes-table-container {
-  overflow-x: auto;
-  max-height: 300px;
+  overflow-y: scroll;
+  max-height: 400px;
   position: relative; /* Adicionado para contexto de posicionamento */
+  margin-top: -5px;
+  font-family: var(--font-code);
+}
+
+div.saloes-table-container {
+  -ms-overflow-style: none; /* IE e Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+div.saloes-table-container::-webkit-scrollbar {
+  display: none;
 }
 
 .saloes-table {
   width: 100%;
   border-collapse: collapse;
-
 }
 
 .saloes-table thead {
@@ -121,23 +120,20 @@ div.saloes-table-container {
 }
 
 .saloes-table th {
-  padding: 1rem;
+  padding: 1.1rem;
   text-align: left;
   font-size: 0.75rem;
   font-weight: 600;
+  font-family: var(--font-code);
   color: #111;
   text-transform: uppercase;
   position: sticky;
-  top: 0;
+  top: 0px;
   background-color: #9da9b9; /* Mesma cor do thead para cobrir o conteúdo */
-
 }
-
-
 
 .saloes-table tbody tr {
   border-bottom: 1px solid #e2e8f0;
-  
 }
 
 .saloes-table tbody tr:nth-child(even) {
@@ -152,6 +148,7 @@ div.saloes-table-container {
   padding: 1rem;
   font-size: 0.875rem;
   color: #334155;
+  font-family: var(--font-code);
 }
 
 /* Status */

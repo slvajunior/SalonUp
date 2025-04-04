@@ -1,9 +1,9 @@
 /* src/components/Layout.css */
 
-body, html {
-  background: #2d372d;
+body {
   margin: 0 0 100px;
   overflow-y: hidden;  
+  background: #292837;
 }
 
 .app-container {

@@ -31,7 +31,7 @@ const Sidebar = () => {
           </li>
           <li className="menu-item">
             <Link to="/saloes" className="sidebar-link">
-              <span className="icon-code">{'<>'}</span>
+              <span className="icon-code">{'</>'}</span>
               <span className="menu-text">Salões</span>
               <span className="shortcut">Ctrl+S</span>
             </Link>
@@ -47,7 +47,7 @@ const Sidebar = () => {
             <Link to="/config" className="sidebar-link">
               <span className="icon-code">{'{}'}</span>
               <span className="menu-text">Config</span>
-              <span className="shortcut">Ctrl+,</span>
+              <span className="shortcut">Ctrl+C</span>
             </Link>
           </li>
         </ul>

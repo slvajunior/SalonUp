@@ -14,6 +14,7 @@ main.content {
   padding: 0;
   width: 1900px;
   overflow-y: scroll; /* Força a rolagem (mesmo sem conteúdo suficiente) */
+  background: #292837;
 }
 
 /* Esconde a barra de rolagem sem afetar a rolagem */
@@ -41,7 +42,7 @@ main.content::-webkit-scrollbar {
   transform: translate(-50%, -50%);
   padding: 1rem;
   width: 100%;
-  margin-top: 650px;
+  margin-top: 500px;
   background-color: #f1f5f9;
 }
 

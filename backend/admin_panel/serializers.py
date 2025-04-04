@@ -20,7 +20,18 @@ class OwnerSerializer(serializers.ModelSerializer):
 class SalaoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Salao
-        fields = ["id", "nome", "cnpj", "endereco", "telefone", "status"]
+        fields = [
+            "id",
+            "nome",
+            "cnpj",
+            "endereco",
+            "cidade",
+            "estado",
+            "telefone",
+            "email",
+            "status",
+            "data_cadastro",
+        ]
 
     def validate_cnpj(self, value):
         """Validação do CNPJ para garantir que ele seja preenchido e tenha um formato válido."""

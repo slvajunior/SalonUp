@@ -1,50 +1,131 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import "./SalaoForm.css";
+// pages/SalaoForm.jsx
 
+import React, { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import "./SalaoForm.css";
 
 const SalaoForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const formRef = useRef(null);
+  const headerRef = useRef(null);
+
+  // Estado para o drag-and-drop
+  const [isDragging, setIsDragging] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+
+  // Estado do formulário
   const [formData, setFormData] = useState({
-    nome: '',
-    cnpj: '',
-    endereco: '',
-    status: 'ativo'
+    nome: "",
+    cnpj: "",
+    endereco: "",
+    cidade: "",
+    estado: "",
+    telefone: "",
+    email: "",
+    status: "ativo",
   });
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Função para carregar os dados do salão
+  // Configuração de posição inicial (modifique esses valores)
+  const INITIAL_POSITION = {
+    x: window.innerWidth * 0.2, // 10% da largura da tela
+    y: window.innerHeight * 0.3 // 10% da altura da tela
+  };
+
+  // Efeito para posicionar o formulário
+  useEffect(() => {
+    if (formRef.current) {
+      // Calcula a posição máxima permitida
+      const maxX = window.innerWidth - formRef.current.offsetWidth;
+      const maxY = window.innerHeight - formRef.current.offsetHeight;
+      
+      // Aplica a posição inicial, garantindo que fique dentro dos limites
+      setPosition({
+        x: Math.max(0, Math.min(INITIAL_POSITION.x, maxX)),
+        y: Math.max(0, Math.min(INITIAL_POSITION.y, maxY))
+      });
+    }
+  }, []);
+
+  // Funções para o drag-and-drop
+  const handleMouseDown = (e) => {
+    if (e.target === headerRef.current || headerRef.current.contains(e.target)) {
+      setIsDragging(true);
+      setOffset({
+        x: e.clientX - position.x,
+        y: e.clientY - position.y
+      });
+      e.preventDefault();
+    }
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    
+    const maxX = window.innerWidth - formRef.current.offsetWidth;
+    const maxY = window.innerHeight - formRef.current.offsetHeight;
+    
+    setPosition({
+      x: Math.max(0, Math.min(e.clientX - offset.x, maxX)),
+      y: Math.max(0, Math.min(e.clientY - offset.y, maxY))
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  // Adicionar event listeners para o drag-and-drop
+  useEffect(() => {
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, offset]);
+
+  // Buscar dados do salão
   const fetchSalao = async () => {
+    console.log(`%c[API] Fetching salão data for ID: ${id}`, 'color: #4fc3f7');
     try {
-      const token = localStorage.getItem('access_token');
+      const token = localStorage.getItem("access_token");
       if (!token) {
-        navigate('/login');
+        navigate("/login");
         return;
       }
 
-      const response = await fetch(`http://127.0.0.1:8000/admin-panel/api/saloes/${id}/`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      const response = await fetch(
+        `http://127.0.0.1:8000/admin-panel/api/saloes/${id}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
-      });
+      );
 
       if (response.status === 401) {
-        // Token inválido ou expirado
-        localStorage.removeItem('access_token');
-        navigate('/login');
+        console.warn("%c[AUTH] Token inválido ou expirado", "color: #ffa000");
+        localStorage.removeItem("access_token");
+        navigate("/login");
         return;
       }
 
       if (!response.ok) {
-        throw new Error('Erro ao carregar dados do salão');
+        throw new Error("Erro ao carregar dados do salão");
       }
 
       const data = await response.json();
+      console.log("%c[DATA] Salão data received:", "color: #69f0ae", data);
       setFormData(data);
     } catch (err) {
+      console.error("%c[ERROR] Failed to fetch salão:", "color: #ff5252", err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -55,113 +136,304 @@ const SalaoForm = () => {
     fetchSalao();
   }, [id]);
 
-  // Função para lidar com mudanças no formulário
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
+    console.log(`%c[FORM] Field updated: ${name}=${value}`, 'color: #ffa000');
   };
 
-  // Função para enviar o formulário
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    console.group("%c[SUBMIT] Saving salão data", "color: #4fc3f7");
+    console.log("%cPayload:", "color: #ffa000", formData);
+
     try {
-      const token = localStorage.getItem('access_token');
+      const token = localStorage.getItem("access_token");
       if (!token) {
-        navigate('/login');
+        navigate("/login");
         return;
       }
 
-      const response = await fetch(`http://127.0.0.1:8000/admin-panel/api/saloes/${id}/`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
+      const response = await fetch(
+        `http://127.0.0.1:8000/admin-panel/api/saloes/${id}/`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
       if (response.status === 401) {
-        localStorage.removeItem('access_token');
-        navigate('/login');
+        localStorage.removeItem("access_token");
+        navigate("/login");
         return;
       }
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || 'Erro ao atualizar salão');
+        throw new Error(errorData.detail || "Erro ao atualizar salão");
       }
 
-      navigate('/admin/saloes');
+      console.log("%c[SUCCESS] Salão updated", "color: #69f0ae");
+      navigate("/admin/saloes");
     } catch (err) {
+      console.error("%c[ERROR] Update failed:", "color: #ff5252", err);
       setError(err.message);
+    } finally {
+      console.groupEnd();
     }
   };
 
-  if (loading) return <div>Carregando...</div>;
-  if (error) return <div>Erro: {error}</div>;
+  // Controles da janela
+  const handleClose = () => {
+    navigate("/admin/saloes");
+  };
+
+  const handleMinimize = () => {
+    console.log("%c[WINDOW] Minimized", "color: #ffa000");
+  };
+
+  const handleExpand = () => {
+    console.log("%c[WINDOW] Maximized", "color: #ffa000");
+  };
+
+  if (loading) return (
+    <div className="terminal-loading">
+      <div className="loading-animation">
+        <span className="loading-char">$</span>
+        <span className="loading-char">'<></>'</span>
+        <span className="loading-char">_</span>
+      </div>
+      <div className="loading-text">Carregando dados do salão...</div>
+    </div>
+  );
+
+  if (error) return (
+    <div className="terminal-error">
+      <div className="error-header">Erro no sistema</div>
+      <div className="error-message">{error}</div>
+      <button className="error-retry" onClick={fetchSalao}>
+        Tentar novamente
+      </button>
+    </div>
+  );
 
   return (
-    <div className="form-container">
-      <h2>Editar Salão</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Nome:</label>
-          <input
-            type="text"
-            name="nome"
-            value={formData.nome || ''}
-            onChange={handleChange}
-            required
-          />
+    <div
+      className={`code-editor ${isDragging ? "dragging" : ""}`}
+      ref={formRef}
+      style={{
+        position: "fixed",
+        left: `${position.x}px`,
+        top: `${position.y}px`,
+        cursor: isDragging ? "grabbing" : "default",
+        userSelect: "none",
+      }}
+      onMouseDown={handleMouseDown}
+    >
+      <div className="editor-header" ref={headerRef}>
+        <div className="window-controls">
+          <span className="control close" onClick={handleClose}></span>
+          <span className="control minimize" onClick={handleMinimize}></span>
+          <span className="control expand" onClick={handleExpand}></span>
         </div>
-
-        <div className="form-group">
-          <label>CNPJ:</label>
-          <input
-            type="text"
-            name="cnpj"
-            value={formData.cnpj || ''}
-            onChange={handleChange}
-            required
-          />
+        <div className="editor-title">
+          salonUp PRO - Editor de Salão {id ? `[ID: ${id}]` : ""}
         </div>
+      </div>
 
-        <div className="form-group">
-          <label>Endereço:</label>
-          <input
-            type="text"
-            name="endereco"
-            value={formData.endereco || ''}
-            onChange={handleChange}
-            required
-          />
-        </div>
+      <div className="editor-body">
+        <form onSubmit={handleSubmit} className="code-form">
+          <div className="form-grid">
+            <div className="form-field">
+              <label className="input-label">
+                <span className="label-comment">
+                  // Nome do estabelecimento
+                </span>
+                <input
+                  type="text"
+                  name="nome"
+                  value={formData.nome || ""}
+                  onChange={handleChange}
+                  className="code-input"
+                  required
+                />
+              </label>
+            </div>
 
-        <div className="form-group">
-          <label>Status:</label>
-          <select
-            name="status"
-            value={formData.status || 'ativo'}
-            onChange={handleChange}
-          >
-            <option value="ativo">Ativo</option>
-            <option value="inativo">Inativo</option>
-          </select>
-        </div>
+            <div className="form-field">
+              <label className="input-label">
+                <span className="label-comment">// CNPJ (somente números)</span>
+                <input
+                  type="text"
+                  name="cnpj"
+                  value={formData.cnpj || ""}
+                  onChange={handleChange}
+                  className="code-input"
+                  required
+                  pattern="\d{14}"
+                  title="14 dígitos numéricos"
+                />
+              </label>
+            </div>
+          </div>
 
-        <button type="submit" className="btn-save">Salvar</button>
-        <button 
-          type="button" 
-          onClick={() => navigate('/admin/saloes')} 
-          className="btn-cancel"
-        >
-          Cancelar
-        </button>
-      </form>
+          <div className="form-field">
+            <label className="input-label">
+              <span className="label-comment">// Endereço completo</span>
+              <input
+                type="text"
+                name="endereco"
+                value={formData.endereco || ""}
+                onChange={handleChange}
+                className="code-input"
+                required
+              />
+            </label>
+          </div>
+
+          <div className="form-grid">
+            <div className="form-field">
+              <label className="input-label">
+                <span className="label-comment">// Cidade</span>
+                <input
+                  type="text"
+                  name="cidade"
+                  value={formData.cidade || ""}
+                  onChange={handleChange}
+                  className="code-input"
+                />
+              </label>
+            </div>
+
+            <div className="form-field">
+              <label className="input-label">
+                <span className="label-comment">// Estado (UF)</span>
+                <select
+                  name="estado"
+                  value={formData.estado || ""}
+                  onChange={handleChange}
+                  className="code-input"
+                >
+                  <option value="">-- Selecione --</option>
+                  {[
+                    "AC",
+                    "AL",
+                    "AP",
+                    "AM",
+                    "BA",
+                    "CE",
+                    "DF",
+                    "ES",
+                    "GO",
+                    "MA",
+                    "MT",
+                    "MS",
+                    "MG",
+                    "PA",
+                    "PB",
+                    "PR",
+                    "PE",
+                    "PI",
+                    "RJ",
+                    "RN",
+                    "RS",
+                    "RO",
+                    "RR",
+                    "SC",
+                    "SP",
+                    "SE",
+                    "TO",
+                  ].map((uf) => (
+                    <option key={uf} value={uf}>
+                      {uf}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div className="form-grid">
+            <div className="form-field">
+              <label className="input-label">
+                <span className="label-comment">// Telefone</span>
+                <input
+                  type="text"
+                  name="telefone"
+                  value={formData.telefone || ""}
+                  onChange={handleChange}
+                  className="code-input"
+                />
+              </label>
+            </div>
+
+            <div className="form-field">
+              <label className="input-label">
+                <span className="label-comment">// E-mail</span>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email || ""}
+                  onChange={handleChange}
+                  className="code-input"
+                />
+              </label>
+            </div>
+          </div>
+
+          <div className="form-field">
+            <label className="input-label">
+              <span className="label-comment">// Status do salão</span>
+              <div className="radio-group">
+                {["ativo", "inativo", "suspenso"].map((status) => (
+                  <label key={status} className="radio-option">
+                    <input
+                      type="radio"
+                      name="status"
+                      value={status}
+                      checked={formData.status === status}
+                      onChange={handleChange}
+                    />
+                    <span className="radio-indicator"></span>
+                    <span className="radio-label">
+                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </label>
+          </div>
+
+          <div className="form-actions">
+            <button
+              type="button"
+              onClick={() => navigate("/admin/saloes")}
+              className="cancel-button"
+            >
+              <span className="button-icon">{"//"}</span>
+              Cancelar
+            </button>
+            <button type="submit" className="save-button">
+              <span className="button-icon">{"=>"}</span>
+              Salvar Alterações
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div className="editor-footer">
+        <span className="status-message">
+          {id ? `Editando salão ID: ${id}` : "Criando novo salão"}
+        </span>
+        <span className="cursor-indicator">_</span>
+      </div>
     </div>
   );
 };
