@@ -1,5 +1,3 @@
-// pages/SalaoForm.jsx
-
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./SalaoForm.css";
@@ -12,8 +10,23 @@ const SalaoForm = () => {
 
   // Estado para o drag-and-drop
   const [isDragging, setIsDragging] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState({ 
+    x: window.innerWidth * 0.03,
+    y: window.innerHeight * 0.06
+  });
   const [offset, setOffset] = useState({ x: 0, y: 0 });
+
+  // Função para formatar CNPJ
+  const formatCNPJ = (value) => {
+    if (!value) return "";
+    const cleaned = value.replace(/\D/g, '');
+    
+    if (cleaned.length <= 2) return cleaned;
+    if (cleaned.length <= 5) return `${cleaned.slice(0, 2)}.${cleaned.slice(2)}`;
+    if (cleaned.length <= 8) return `${cleaned.slice(0, 2)}.${cleaned.slice(2, 5)}.${cleaned.slice(5)}`;
+    if (cleaned.length <= 12) return `${cleaned.slice(0, 2)}.${cleaned.slice(2, 5)}.${cleaned.slice(5, 8)}/${cleaned.slice(8)}`;
+    return `${cleaned.slice(0, 2)}.${cleaned.slice(2, 5)}.${cleaned.slice(5, 8)}/${cleaned.slice(8, 12)}-${cleaned.slice(12, 14)}`;
+  };
 
   // Estado do formulário
   const [formData, setFormData] = useState({
@@ -30,28 +43,29 @@ const SalaoForm = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Configuração de posição inicial (modifique esses valores)
-  const INITIAL_POSITION = {
-    x: window.innerWidth * 0.2, // 10% da largura da tela
-    y: window.innerHeight * 0.3 // 10% da altura da tela
-  };
-
-  // Efeito para posicionar o formulário
+  // Efeitos e funções de drag-and-drop (mantidos iguais)
   useEffect(() => {
-    if (formRef.current) {
-      // Calcula a posição máxima permitida
-      const maxX = window.innerWidth - formRef.current.offsetWidth;
-      const maxY = window.innerHeight - formRef.current.offsetHeight;
-      
-      // Aplica a posição inicial, garantindo que fique dentro dos limites
-      setPosition({
-        x: Math.max(0, Math.min(INITIAL_POSITION.x, maxX)),
-        y: Math.max(0, Math.min(INITIAL_POSITION.y, maxY))
-      });
-    }
+    const updatePosition = () => {
+      if (formRef.current) {
+        const maxX = window.innerWidth - formRef.current.offsetWidth;
+        const maxY = window.innerHeight - formRef.current.offsetHeight;
+        
+        setPosition(prev => ({
+          x: Math.max(0, Math.min(prev.x, maxX)),
+          y: Math.max(0, Math.min(prev.y, maxY))
+        }));
+      }
+    };
+
+    const timer = setTimeout(updatePosition, 50);
+    window.addEventListener('resize', updatePosition);
+    
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', updatePosition);
+    };
   }, []);
 
-  // Funções para o drag-and-drop
   const handleMouseDown = (e) => {
     if (e.target === headerRef.current || headerRef.current.contains(e.target)) {
       setIsDragging(true);
@@ -79,7 +93,6 @@ const SalaoForm = () => {
     setIsDragging(false);
   };
 
-  // Adicionar event listeners para o drag-and-drop
   useEffect(() => {
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
@@ -92,7 +105,6 @@ const SalaoForm = () => {
 
   // Buscar dados do salão
   const fetchSalao = async () => {
-    console.log(`%c[API] Fetching salão data for ID: ${id}`, 'color: #4fc3f7');
     try {
       const token = localStorage.getItem("access_token");
       if (!token) {
@@ -111,7 +123,6 @@ const SalaoForm = () => {
       );
 
       if (response.status === 401) {
-        console.warn("%c[AUTH] Token inválido ou expirado", "color: #ffa000");
         localStorage.removeItem("access_token");
         navigate("/login");
         return;
@@ -122,10 +133,11 @@ const SalaoForm = () => {
       }
 
       const data = await response.json();
-      console.log("%c[DATA] Salão data received:", "color: #69f0ae", data);
-      setFormData(data);
+      setFormData({
+        ...data,
+        cnpj: formatCNPJ(data.cnpj) // Formata o CNPJ ao carregar
+      });
     } catch (err) {
-      console.error("%c[ERROR] Failed to fetch salão:", "color: #ff5252", err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -133,22 +145,36 @@ const SalaoForm = () => {
   };
 
   useEffect(() => {
-    fetchSalao();
+    if (id) fetchSalao();
+    else setLoading(false);
   }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
-    console.log(`%c[FORM] Field updated: ${name}=${value}`, 'color: #ffa000');
+  };
+
+  const handleCnpjChange = (e) => {
+    const { name, value } = e.target;
+    const cleaned = value.replace(/\D/g, '');
+    setFormData(prev => ({
+      ...prev,
+      [name]: formatCNPJ(cleaned) // Armazena já formatado
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.group("%c[SUBMIT] Saving salão data", "color: #4fc3f7");
-    console.log("%cPayload:", "color: #ffa000", formData);
+    
+    // Validação do CNPJ
+    const cnpjDigits = formData.cnpj.replace(/\D/g, '');
+    if (cnpjDigits.length !== 14) {
+      alert("CNPJ deve conter 14 dígitos!");
+      return;
+    }
 
     try {
       const token = localStorage.getItem("access_token");
@@ -157,17 +183,22 @@ const SalaoForm = () => {
         return;
       }
 
-      const response = await fetch(
-        `http://127.0.0.1:8000/admin-panel/api/saloes/${id}/`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const method = id ? "PUT" : "POST";
+      const url = id 
+        ? `http://127.0.0.1:8000/admin-panel/api/saloes/${id}/`
+        : "http://127.0.0.1:8000/admin-panel/api/saloes/";
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          cnpj: formData.cnpj // Mantém a formatação
+        }),
+      });
 
       if (response.status === 401) {
         localStorage.removeItem("access_token");
@@ -177,31 +208,19 @@ const SalaoForm = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || "Erro ao atualizar salão");
+        throw new Error(errorData.detail || "Erro ao salvar salão");
       }
 
-      console.log("%c[SUCCESS] Salão updated", "color: #69f0ae");
       navigate("/admin/saloes");
     } catch (err) {
-      console.error("%c[ERROR] Update failed:", "color: #ff5252", err);
       setError(err.message);
-    } finally {
-      console.groupEnd();
     }
   };
 
   // Controles da janela
-  const handleClose = () => {
-    navigate("/admin/saloes");
-  };
-
-  const handleMinimize = () => {
-    console.log("%c[WINDOW] Minimized", "color: #ffa000");
-  };
-
-  const handleExpand = () => {
-    console.log("%c[WINDOW] Maximized", "color: #ffa000");
-  };
+  const handleClose = () => navigate("/admin/saloes");
+  const handleMinimize = () => console.log("%c[WINDOW] Minimized", "color: #ffa000");
+  const handleExpand = () => console.log("%c[WINDOW] Maximized", "color: #ffa000");
 
   if (loading) return (
     <div className="terminal-loading">
@@ -225,15 +244,15 @@ const SalaoForm = () => {
   );
 
   return (
-    <div
-      className={`code-editor ${isDragging ? "dragging" : ""}`}
+    <div 
+      className={`code-editor ${isDragging ? 'dragging' : ''}`}
       ref={formRef}
       style={{
-        position: "fixed",
+        position: 'fixed',
         left: `${position.x}px`,
         top: `${position.y}px`,
-        cursor: isDragging ? "grabbing" : "default",
-        userSelect: "none",
+        cursor: isDragging ? 'grabbing' : 'default',
+        userSelect: 'none'
       }}
       onMouseDown={handleMouseDown}
     >
@@ -244,7 +263,7 @@ const SalaoForm = () => {
           <span className="control expand" onClick={handleExpand}></span>
         </div>
         <div className="editor-title">
-          salonUp PRO - Editor de Salão {id ? `[ID: ${id}]` : ""}
+          salonUp PRO - {id ? `Editar Salão [ID: ${id}]` : "Novo Salão"}
         </div>
       </div>
 
@@ -253,9 +272,7 @@ const SalaoForm = () => {
           <div className="form-grid">
             <div className="form-field">
               <label className="input-label">
-                <span className="label-comment">
-                  // Nome do estabelecimento
-                </span>
+                <span className="label-comment">// Nome do estabelecimento</span>
                 <input
                   type="text"
                   name="nome"
@@ -269,21 +286,22 @@ const SalaoForm = () => {
 
             <div className="form-field">
               <label className="input-label">
-                <span className="label-comment">// CNPJ (somente números)</span>
+                <span className="label-comment">// CNPJ</span>
                 <input
                   type="text"
                   name="cnpj"
                   value={formData.cnpj || ""}
-                  onChange={handleChange}
+                  onChange={handleCnpjChange}
                   className="code-input"
                   required
-                  pattern="\d{14}"
-                  title="14 dígitos numéricos"
+                  maxLength={18}
+                  title="Digite o CNPJ com ou sem formatação (14 dígitos)"
                 />
               </label>
             </div>
           </div>
 
+          {/* Restante dos campos do formulário (mantidos iguais) */}
           <div className="form-field">
             <label className="input-label">
               <span className="label-comment">// Endereço completo</span>
@@ -322,38 +340,10 @@ const SalaoForm = () => {
                   className="code-input"
                 >
                   <option value="">-- Selecione --</option>
-                  {[
-                    "AC",
-                    "AL",
-                    "AP",
-                    "AM",
-                    "BA",
-                    "CE",
-                    "DF",
-                    "ES",
-                    "GO",
-                    "MA",
-                    "MT",
-                    "MS",
-                    "MG",
-                    "PA",
-                    "PB",
-                    "PR",
-                    "PE",
-                    "PI",
-                    "RJ",
-                    "RN",
-                    "RS",
-                    "RO",
-                    "RR",
-                    "SC",
-                    "SP",
-                    "SE",
-                    "TO",
-                  ].map((uf) => (
-                    <option key={uf} value={uf}>
-                      {uf}
-                    </option>
+                  {['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS',
+                     'MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC',
+                     'SP','SE','TO'].map(uf => (
+                    <option key={uf} value={uf}>{uf}</option>
                   ))}
                 </select>
               </label>
@@ -392,7 +382,7 @@ const SalaoForm = () => {
             <label className="input-label">
               <span className="label-comment">// Status do salão</span>
               <div className="radio-group">
-                {["ativo", "inativo", "suspenso"].map((status) => (
+                {['ativo', 'inativo', 'suspenso'].map(status => (
                   <label key={status} className="radio-option">
                     <input
                       type="radio"
@@ -402,9 +392,7 @@ const SalaoForm = () => {
                       onChange={handleChange}
                     />
                     <span className="radio-indicator"></span>
-                    <span className="radio-label">
-                      {status.charAt(0).toUpperCase() + status.slice(1)}
-                    </span>
+                    <span className="radio-label">{status.charAt(0).toUpperCase() + status.slice(1)}</span>
                   </label>
                 ))}
               </div>
@@ -420,9 +408,12 @@ const SalaoForm = () => {
               <span className="button-icon">{"//"}</span>
               Cancelar
             </button>
-            <button type="submit" className="save-button">
+            <button
+              type="submit"
+              className="save-button"
+            >
               <span className="button-icon">{"=>"}</span>
-              Salvar Alterações
+              {id ? "Salvar Alterações" : "Criar Salão"}
             </button>
           </div>
         </form>

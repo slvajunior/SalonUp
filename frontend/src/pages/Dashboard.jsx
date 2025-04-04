@@ -11,16 +11,17 @@ Chart.register(...registerables);
 const Dashboard = () => {
   // Estado para controlar o intervalo de tempo
   const [timeRange, setTimeRange] = useState("month"); // "week", "month" ou "year"
-  
+
   const [dashboardData, setDashboardData] = useState({
     revenue_chart: { labels: [], data: [] },
     salons_by_region: { labels: [], data: [] },
     recent_saloes: [],
-    recent_activities: []
+    recent_activities: [],
   });
-  
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [salons, setSalons] = useState([]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -28,15 +29,18 @@ const Dashboard = () => {
         const token = localStorage.getItem("access_token");
         if (!token) throw new Error("Token de autenticação não encontrado");
 
-        const response = await fetch(`http://127.0.0.1:8000/admin-panel/dashboard/?range=${timeRange}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          `http://127.0.0.1:8000/admin-panel/dashboard/?range=${timeRange}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         if (!response.ok) throw new Error("Erro ao carregar dados");
-        
+
         const data = await response.json();
         setDashboardData(data);
         setError(null);
@@ -58,21 +62,38 @@ const Dashboard = () => {
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className="error-container">
         <h3>Erro ao carregar dados</h3>
         <p>{error}</p>
-        <button onClick={() => window.location.reload()}>Tentar novamente</button>
+        <button onClick={() => window.location.reload()}>
+          Tentar novamente
+        </button>
       </div>
     );
   }
-  
+
   if (!dashboardData) {
     return <div>Nenhum dado disponível</div>;
   }
 
+  const statusLabels = {
+    ativo: "Ativo",
+    inativo: "Inativo",
+    suspenso: "Suspenso",
+  };
+
+  {salons.map((salon, index) => (
+    <div key={index}>
+      <span className={`status-badge ${salon.status}`}>
+        {statusLabels[salon.status] || "Desconhecido"}
+      </span>
+    </div>
+  ))}
+  
+  
   // Dados para gráficos
   const revenueChartData = {
     labels: dashboardData?.revenue_chart?.labels || [],
@@ -88,7 +109,7 @@ const Dashboard = () => {
       },
     ],
   };
-  
+
   const salonsByRegionData = {
     labels: dashboardData?.salons_by_region?.labels || [],
     datasets: [
@@ -169,7 +190,9 @@ const Dashboard = () => {
         <div className="metric-card warning">
           <div className="metric-content">
             <h3>Faturamento Mensal</h3>
-            <p className="metric-value">R$ {dashboardData.faturamento_mensal.toFixed(2)}</p>
+            <p className="metric-value">
+              R$ {dashboardData.faturamento_mensal.toFixed(2)}
+            </p>
             <p className="metric-change positive">
               +{dashboardData.revenue_growth}% em relação ao último período
             </p>
@@ -263,10 +286,18 @@ const Dashboard = () => {
                     <td>{salon.cidade}</td>
                     <td>
                       <span className={`status-badge ${salon.status}`}>
-                        {salon.status === "ativo" ? "Ativo" : "Inativo"}
+                        {salon.status === "ativo"
+                          ? "Ativo"
+                          : salon.status === "inativo"
+                          ? "Inativo"
+                          : salon.status === "suspenso"
+                          ? "Suspenso"
+                          : "Desconhecido"}
                       </span>
                     </td>
-                    <td>{new Date(salon.data_cadastro).toLocaleDateString()}</td>
+                    <td>
+                      {new Date(salon.data_cadastro).toLocaleDateString()}
+                    </td>
                   </tr>
                 ))}
               </tbody>

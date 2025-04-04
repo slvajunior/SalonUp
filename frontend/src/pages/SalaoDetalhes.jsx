@@ -1,21 +1,74 @@
-//pages/SalaoDetalhes.jsx
-
-import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import "./SalaoDetalhes.css"; // CSS específico para esta página
+import React, { useState, useEffect, useRef } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import "./SalaoDetalhes.css";
 
 const SalaoDetalhes = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [salao, setSalao] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [position, setPosition] = useState({ x: 100, y: 100 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const windowRef = useRef(null);
+  const headerRef = useRef(null);
+
+  useEffect(() => {
+    if (windowRef.current) {
+      const maxX = window.innerWidth - windowRef.current.offsetWidth;
+      const maxY = window.innerHeight - windowRef.current.offsetHeight;
+      setPosition({
+        x: Math.max(0, Math.min(position.x, maxX)),
+        y: Math.max(0, Math.min(position.y, maxY))
+      });
+    }
+  }, []);
+
+  const handleMouseDown = (e) => {
+    if (e.target === headerRef.current || headerRef.current.contains(e.target)) {
+      setIsDragging(true);
+      setOffset({
+        x: e.clientX - position.x,
+        y: e.clientY - position.y
+      });
+      e.preventDefault();
+    }
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    
+    const maxX = window.innerWidth - windowRef.current.offsetWidth;
+    const maxY = window.innerHeight - windowRef.current.offsetHeight;
+    
+    setPosition({
+      x: Math.max(0, Math.min(e.clientX - offset.x, maxX)),
+      y: Math.max(0, Math.min(e.clientY - offset.y, maxY))
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, offset]);
 
   useEffect(() => {
     const fetchSalao = async () => {
       try {
+        console.log(`%c[API] Fetching salão details for ID: ${id}`, 'color: #4fc3f7');
         const token = localStorage.getItem("access_token");
         if (!token) {
-          window.location.href = "/login";
+          navigate("/login");
           return;
         }
 
@@ -29,8 +82,9 @@ const SalaoDetalhes = () => {
         );
 
         if (response.status === 401) {
+          console.warn("%c[AUTH] Token inválido ou expirado", "color: #ffa000");
           localStorage.removeItem("access_token");
-          window.location.href = "/login";
+          navigate("/login");
           return;
         }
 
@@ -39,8 +93,10 @@ const SalaoDetalhes = () => {
         }
 
         const data = await response.json();
+        console.log("%c[DATA] Salão details received:", "color: #69f0ae", data);
         setSalao(data);
       } catch (err) {
+        console.error("%c[ERROR] Failed to fetch salão details:", "color: #ff5252", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -48,77 +104,130 @@ const SalaoDetalhes = () => {
     };
 
     fetchSalao();
-  }, [id]);
+  }, [id, navigate]);
 
   if (loading) {
     return (
-      <div className="salao-detalhes-loading">
-        <div className="loading-spinner"></div>
+      <div className="terminal-loading">
+        <div className="loading-animation">
+          <span className="loading-char">$</span>
+          <span className="loading-char">'<></>'</span>
+          <span className="loading-char">_</span>
+        </div>
+        <div className="loading-text">Carregando detalhes do salão...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="salao-detalhes-error">
-        <p>{error}</p>
-        <Link to="/saloes" className="back-button">
-          Voltar para a lista
-        </Link>
+      <div className="terminal-error">
+        <div className="error-header">Erro no sistema</div>
+        <div className="error-message">{error}</div>
+        <button onClick={() => navigate("/admin/saloes")} className="error-retry">
+          Voltar para lista
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="salao-detalhes-container">
-      <div className="salao-detalhes-card">
-        <div className="salao-detalhes-header">
-          <h1>{salao.nome}</h1>
-          <span className={`status-badge ${salao.status === 'ativo' ? 'ativo' : 'inativo'}`}>
-            {salao.status}
-          </span>
+    <div 
+      className={`code-editor ${isDragging ? 'dragging' : ''}`}
+      ref={windowRef}
+      style={{
+        position: 'fixed',
+        left: `${position.x}px`,
+        top: `${position.y}px`,
+        cursor: isDragging ? 'grabbing' : 'default',
+        userSelect: 'none'
+      }}
+      onMouseDown={handleMouseDown}
+    >
+      <div className="editor-header" ref={headerRef}>
+        <div className="window-controls">
+          <span className="control close" onClick={() => navigate("/admin/saloes")}></span>
+          <span className="control minimize"></span>
+          <span className="control expand"></span>
         </div>
+        <div className="editor-title">
+          salonUp PRO - Detalhes do Salão [ID: {id}]
+        </div>
+      </div>
 
-        <div className="salao-detalhes-content">
+      <div className="editor-body">
+        <div className="code-viewer">
           <div className="detail-section">
-            <h2>Informações Básicas</h2>
-            <div className="detail-row">
-              <span className="detail-label">CNPJ:</span>
-              <span className="detail-value">{salao.cnpj}</span>
+            <div className="code-line">
+              <span className="code-comment">// Informações básicas</span>
             </div>
-            <div className="detail-row">
-              <span className="detail-label">Endereço:</span>
-              <span className="detail-value">{salao.endereco}</span>
-            </div>
-            <div className="detail-row">
-              <span className="detail-label">Data de Cadastro:</span>
-              <span className="detail-value">
-                {new Date(salao.data_cadastro).toLocaleDateString()}
+            <div className="code-line">
+              <span className="code-property">nome:</span>
+              <span className="code-value">"{salao.nome}"</span>
+              <span className="code-status" data-status={salao.status}>
+                {salao.status}
               </span>
             </div>
+            <div className="code-line">
+              <span className="code-property">cnpj:</span>
+              <span className="code-value">"{salao.cnpj}"</span>
+            </div>
+            <div className="code-line">
+              <span className="code-property">endereco:</span>
+              <span className="code-value">"{salao.endereco}"</span>
+            </div>
+            <div className="code-line">
+              <span className="code-property">cidade:</span>
+              <span className="code-value">"{salao.cidade || 'null'}"</span>
+            </div>
+            <div className="code-line">
+              <span className="code-property">estado:</span>
+              <span className="code-value">"{salao.estado || 'null'}"</span>
+            </div>
           </div>
 
           <div className="detail-section">
-            <h2>Contato</h2>
-            <div className="detail-row">
-              <span className="detail-label">Telefone:</span>
-              <span className="detail-value">{salao.telefone || 'Não informado'}</span>
+            <div className="code-line">
+              <span className="code-comment">// Informações de contato</span>
             </div>
-            <div className="detail-row">
-              <span className="detail-label">Email:</span>
-              <span className="detail-value">{salao.email || 'Não informado'}</span>
+            <div className="code-line">
+              <span className="code-property">telefone:</span>
+              <span className="code-value">"{salao.telefone || 'null'}"</span>
+            </div>
+            <div className="code-line">
+              <span className="code-property">email:</span>
+              <span className="code-value">"{salao.email || 'null'}"</span>
+            </div>
+            <div className="code-line">
+              <span className="code-property">data_cadastro:</span>
+              <span className="code-value">"{new Date(salao.data_cadastro).toLocaleDateString()}"</span>
             </div>
           </div>
 
-          <div className="salao-detalhes-actions">
-            <Link to="/saloes" className="back-button">
+          <div className="form-actions">
+            <button
+              onClick={() => navigate("/admin/saloes")}
+              className="cancel-button"
+            >
+              <span className="button-icon">{"//"}</span>
               Voltar
-            </Link>
-            <Link to={`/saloes/editar/${id}`} className="edit-button">
+            </button>
+            <button
+              onClick={() => navigate(`/admin/saloes/editar/${id}`)}
+              className="save-button"
+            >
+              <span className="button-icon">{"=>"}</span>
               Editar Salão
-            </Link>
+            </button>
           </div>
         </div>
+      </div>
+
+      <div className="editor-footer">
+        <span className="status-message">
+          Visualizando salão ID: {id}
+        </span>
+        <span className="cursor-indicator">_</span>
       </div>
     </div>
   );

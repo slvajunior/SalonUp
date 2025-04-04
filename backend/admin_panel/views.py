@@ -20,6 +20,8 @@ from django.utils import timezone
 from datetime import timedelta
 from .models import Owner, Salao, Pagamento
 from django.core.exceptions import ValidationError
+from dateutil.relativedelta import relativedelta
+
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -184,7 +186,9 @@ class DashboardView(APIView):
             labels = []
             data = []
             for i in range(11, -1, -1):
-                month_start = today.replace(day=1) - timedelta(days=30 * i)
+                # month_start = today.replace(day=1) - timedelta(days=30 * i)
+                month_start = (today.replace(day=1) - relativedelta(months=i))
+
                 month_end = (month_start + timedelta(days=32)).replace(day=1)
                 labels.append(month_start.strftime("%b"))
                 total = (

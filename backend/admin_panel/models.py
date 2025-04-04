@@ -65,6 +65,7 @@ class Salao(models.Model):
     STATUS_CHOICES = [
         ("ativo", "Ativo"),
         ("inativo", "Inativo"),
+        ("suspenso", "Suspenso")
     ]
 
     nome = models.CharField(max_length=100)
@@ -74,8 +75,13 @@ class Salao(models.Model):
     estado = models.CharField(max_length=2)
     telefone = models.CharField(max_length=15)
     email = models.EmailField()
-    status = models.CharField(max_length=7, choices=STATUS_CHOICES, default="ativo")
     data_cadastro = models.DateTimeField(default=timezone.now)
+
+    status = models.CharField(
+        max_length=20,  # Aumentado de 7 para 10 para garantir espaço
+        choices=STATUS_CHOICES,
+        default='ativo'
+    )
 
     proprietario = models.ForeignKey(
         settings.AUTH_USER_MODEL,
