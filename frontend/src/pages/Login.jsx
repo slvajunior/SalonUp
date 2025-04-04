@@ -1,96 +1,19 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
 const Login = () => {
-  const [credentials, setCredentials] = useState({
-    username: "",
-    senha: ""
-  });
+  const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showVirtualKeyboard, setShowVirtualKeyboard] = useState(false);
+  const [focused, setFocused] = useState(false);
   const navigate = useNavigate();
-  const formRef = useRef(null);
-  const headerRef = useRef(null);
   const passwordRef = useRef(null);
 
-  // Estado para o drag-and-drop
-  const [isDragging, setIsDragging] = useState(false);
-  const [position, setPosition] = useState({ 
-    x: window.innerWidth * 0.3,
-    y: window.innerHeight * 0.3
-  });
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
-
-  // Limpar tokens quando a aba perde visibilidade
+  // Auto-foco no campo de senha
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-      }
-    };
-
-    window.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => window.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, []);
-
-  // Funções para o drag-and-drop (mantidas iguais)
-  const handleMouseDown = (e) => {
-    if (e.target === headerRef.current || headerRef.current.contains(e.target)) {
-      setIsDragging(true);
-      setOffset({
-        x: e.clientX - position.x,
-        y: e.clientY - position.y
-      });
-      e.preventDefault();
-    }
-  };
-
-  const handleMouseMove = (e) => {
-    if (!isDragging) return;
-    
-    const maxX = window.innerWidth - formRef.current.offsetWidth;
-    const maxY = window.innerHeight - formRef.current.offsetHeight;
-    
-    setPosition({
-      x: Math.max(0, Math.min(e.clientX - offset.x, maxX)),
-      y: Math.max(0, Math.min(e.clientY - offset.y, maxY))
-    });
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  // Adicionar event listeners para o drag-and-drop
-  useEffect(() => {
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging, offset]);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setCredentials(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleVirtualKeyPress = (key) => {
-    setCredentials(prev => ({
-      ...prev,
-      senha: prev.senha + key
-    }));
-    // Mantém o foco no campo de senha
     passwordRef.current.focus();
-  };
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -102,8 +25,8 @@ const Login = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          username: credentials.username,
-          password: credentials.senha
+          username: "johnf", // Usuário fixo
+          password: senha,
         }),
       });
 
@@ -112,158 +35,64 @@ const Login = () => {
       if (response.ok) {
         localStorage.setItem("access_token", data.access);
         localStorage.setItem("refresh_token", data.refresh);
-        console.log("%c[LOGIN] Authentication successful", "color: #69f0ae");
-        setCredentials({ username: "", senha: "" }); // Limpa os campos
         navigate("/admin");
       } else {
-        console.error("%c[LOGIN] Authentication failed", "color: #ff5252", data);
-        setError("Usuário ou senha inválidos!");
-        setCredentials(prev => ({ ...prev, senha: "" })); // Limpa só a senha
+        setError("Senha incorreta!");
+        setSenha("");
+        passwordRef.current.focus();
       }
     } catch (error) {
-      console.error("%c[LOGIN] Connection error:", "color: #ff5252", error);
-      setError("Erro ao conectar-se ao servidor.");
+      setError("Erro de conexão com o servidor");
     } finally {
       setLoading(false);
     }
   };
 
-  // Controles da janela (mantidos iguais)
-  const handleClose = () => {
-    console.log("%c[WINDOW] Login closed", "color: #ff5252");
-  };
-
-  const handleMinimize = () => {
-    console.log("%c[WINDOW] Login minimized", "color: #ffa000");
-  };
-
-  const handleExpand = () => {
-    console.log("%c[WINDOW] Login maximized", "color: #ffa000");
-  };
-
-  // Componente do teclado virtual (opcional)
-  const VirtualKeyboard = ({ onKeyPress, onClose }) => (
-    <div className="virtual-keyboard">
-      <div className="keyboard-keys">
-        {['1','2','3','4','5','6','7','8','9','0','!','@','#','$','q','w','e','r','t','y',
-           'u','i','o','p','a','s','d','f','g','h','j','k','l','z','x','c','v','b','n','m'].map(key => (
-          <button 
-            key={key} 
-            className="keyboard-key"
-            onClick={() => onKeyPress(key)}
-          >
-            {key}
-          </button>
-        ))}
-      </div>
-      <button 
-        className="keyboard-close"
-        onClick={onClose}
-      >
-        Fechar Teclado
-      </button>
-    </div>
-  );
-
   return (
-    <div 
-      className={`code-editor login-window ${isDragging ? 'dragging' : ''}`}
-      ref={formRef}
-      style={{
-        position: 'fixed',
-        left: `${position.x}px`,
-        top: `${position.y}px`,
-        cursor: isDragging ? 'grabbing' : 'default',
-        userSelect: 'none'
-      }}
-      onMouseDown={handleMouseDown}
-    >
-      <div className="editor-header" ref={headerRef}>
-        <div className="window-controls">
-          <span className="control close" onClick={handleClose}></span>
-          <span className="control minimize" onClick={handleMinimize}></span>
-          <span className="control expand" onClick={handleExpand}></span>
+    <div className="login-container">
+      <div className="login-box">
+        {/* Avatar do usuário */}
+        <div className="user-avatar">
+          <img 
+            src="/avatar-admin.png"
+            alt="Admin"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+PHBhdGggZD0iTTEyIDJDNi40NzkgMiAyIDYuNDc5IDIgMTJzNC40NzkgMTAgMTAgMTAgMTAtNC40NzkgMTAtMTBTMTcuNTIxIDIgMTIgMnptMCAyYzIuMjEgMCA0LjIxLjg5IDUuNjUgMi4zNUwxMiAxMmw1LjY1LTUuNjVDMTYuMjEgNC44OSAxNC4yMSA0IDEyIDR6TTQgMTJjMC0yLjIxLjg5LTQuMjEgMi4zNS01LjY1TDEyIDEwbDUuNjUgNS42NUMxNi4yMSAxOS4xMSAxNC4yMSAyMCAxMiAyMHMtMi4yMS0uODktNS42NS0yLjM1TDEyIDEybC01LjY1IDUuNjVDNC44OSAxNi4yMSA0IDE0LjIxIDQgMTJ6bTguNjUgNS42NUMxNC4yMSAxOS4xMSAxMi4yMSAyMCAxMiAyMHMtMi4yMS0uODktNS42NS0yLjM1TDEyIDEybDUuNjUgNS42NXpNMTIgMTRjLTEuMTA0IDAtMi0uODk2LTItMnMuODk2LTIgMi0yIDIgLjg5NiAyIDItLjg5NiAyLTIgMnoiLz48L3N2Zz4=";
+            }}
+          />
+          <div className="username">admin</div>
         </div>
-        <div className="editor-title">
-          salonUp PRO - Authentication Required
-        </div>
-      </div>
 
-      <div className="editor-body">
-        <form onSubmit={handleLogin} className="code-form" autoComplete="off">
-          <div className="form-field">
-            <label className="input-label">
-              <span className="label-comment">// Username</span>
-              <input
-                type="text"
-                name="username"
-                value={credentials.username}
-                onChange={handleInputChange}
-                className="code-input"
-                required
-                autoComplete="off"
-              />
-            </label>
-          </div>
-
-          <div className="form-field">
-            <label className="input-label">
-              <span className="label-comment">// Password</span>
-              <input
-                type="password"
-                name="senha"
-                value={credentials.senha}
-                onChange={handleInputChange}
-                className="code-input"
-                required
-                autoComplete="new-password"
-                ref={passwordRef}
-              />
-              <button 
-                type="button" 
-                className="keyboard-toggle"
-                onClick={() => setShowVirtualKeyboard(!showVirtualKeyboard)}
-              >
-                {showVirtualKeyboard ? "▲" : "▼"} Teclado Virtual
-              </button>
-            </label>
-          </div>
-
-          {showVirtualKeyboard && (
-            <VirtualKeyboard 
-              onKeyPress={handleVirtualKeyPress}
-              onClose={() => setShowVirtualKeyboard(false)}
+        {/* Campo de senha */}
+        <form onSubmit={handleLogin} className="login-form">
+          <div className={`password-field ${focused ? "focused" : ""} ${error ? "error" : ""}`}>
+            <input
+              type="password"
+              ref={passwordRef}
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              placeholder="Digite sua senha"
+              autoComplete="new-password"
             />
-          )}
-
-          {error && (
-            <div className="form-field">
-              <div className="error-message">
-                <span className="error-icon">⚠️</span> {error}
-              </div>
-            </div>
-          )}
-
-          <div className="form-actions">
-            <button
-              type="submit"
-              className="save-button"
-              disabled={loading}
-            >
-              <span className="button-icon">
-                {loading ? "⌛" : "=>"}
-              </span>
-              {loading ? "Authenticating..." : "Login"}
-            </button>
+            {loading && <div className="loading-indicator"></div>}
           </div>
+          {error && <div className="error-message">{error}</div>}
         </form>
+
+        {/* Dica */}
+        <div className="login-hint">
+          Pressione Enter para acessar o sistema
+        </div>
       </div>
 
-      <div className="editor-footer">
-        <span className="status-message">
-          {loading ? "Verifying credentials..." : "Enter admin credentials"}
-        </span>
-        <span className="cursor-indicator">_</span>
+      {/* Rodapé */}
+      <div className="login-footer">
+        <span>salonUp PRO</span>
+        <span>v2.0</span>
+        <span>{new Date().toLocaleDateString()}</span>
       </div>
     </div>
   );
