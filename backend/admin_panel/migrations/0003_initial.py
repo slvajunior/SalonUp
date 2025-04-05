@@ -9,17 +9,16 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("agendamentos", "0001_initial"),
-        ("admin_panel", "0001_initial"),
+        ("saloes", "0001_initial"),
+        ("admin_panel", "0002_initial"),
     ]
 
     operations = [
         migrations.AddField(
             model_name="pagamento",
-            name="agendamento",
+            name="salao",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE,
-                to="agendamentos.agendamento",
+                on_delete=django.db.models.deletion.CASCADE, to="saloes.salao"
             ),
         ),
     ]

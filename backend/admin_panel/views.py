@@ -18,9 +18,10 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import Count, Sum
 from django.utils import timezone
 from datetime import timedelta
-from .models import Owner, Salao, Pagamento
+from .models import Owner, Pagamento
 from django.core.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
+from saloes.models import Salao
 
 
 logger = logging.getLogger(__name__)

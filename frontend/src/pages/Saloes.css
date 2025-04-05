@@ -163,16 +163,20 @@ div.saloes-table-container::-webkit-scrollbar {
 .status-ativo {
   background-color: #dcfce7;
   color: #166534;
+  text-transform: capitalize;
 }
 
 .status-inativo {
   background-color: #fee2e2;
   color: #991b1b;
+  text-transform: capitalize;
+  text-wrap: normal;
 }
 
 .status-suspenso {
   background-color: #f8f1e0;
   color: #fab402;
+  text-transform: capitalize;
 }
 
 /* Ações */

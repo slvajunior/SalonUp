@@ -206,7 +206,7 @@ const SalaoDetalhes = () => {
 
           <div className="form-actions">
             <button
-              onClick={() => navigate("/admin/saloes")}
+              onClick={() => navigate("/saloes")}
               className="cancel-button"
             >
               <span className="button-icon">{"//"}</span>

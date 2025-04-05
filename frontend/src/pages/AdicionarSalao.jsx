@@ -10,8 +10,8 @@ const AdicionarSalao = () => {
   // Estado para o drag-and-drop
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ 
-    x: window.innerWidth * 0.03,
-    y: window.innerHeight * 0.06
+    x: window.innerWidth * 0.25,
+    y: window.innerHeight * 0.15
   });
   const [offset, setOffset] = useState({ x: 0, y: 0 });
 

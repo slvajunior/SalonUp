@@ -1,4 +1,5 @@
 // src/routes/index.jsx
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Dashboard from "../pages/Dashboard";
 import Saloes from "../pages/Saloes";

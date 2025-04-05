@@ -211,7 +211,7 @@ const SalaoForm = () => {
         throw new Error(errorData.detail || "Erro ao salvar salão");
       }
 
-      navigate("/admin/saloes");
+      navigate("/saloes");
     } catch (err) {
       setError(err.message);
     }
@@ -402,7 +402,7 @@ const SalaoForm = () => {
           <div className="form-actions">
             <button
               type="button"
-              onClick={() => navigate("/admin/saloes")}
+              onClick={() => navigate("/saloes")}
               className="cancel-button"
             >
               <span className="button-icon">{"//"}</span>

@@ -128,6 +128,12 @@ const Saloes = () => {
     );
   }
 
+  const statusMap = {
+    ativo: "Active",
+    inativo: "Inactive",
+    suspenso: "Suspended",
+  };
+
   return (
     <div className="saloes-container">
       <div className="saloes-content">
@@ -179,7 +185,7 @@ const Saloes = () => {
                           : ""
                       }`}
                     >
-                      {salao.status}
+                      {statusMap[salao.status]}
                     </span>
                   </td>
                   {/* Dentro do mapeamento dos salões */}

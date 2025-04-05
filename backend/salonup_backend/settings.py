@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "corsheaders",
     "clientes",
+    "saloes",
     "core",
     "agendamentos",
     "admin_panel",

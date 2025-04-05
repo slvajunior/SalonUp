@@ -85,15 +85,16 @@ const Dashboard = () => {
     suspenso: "Suspenso",
   };
 
-  {salons.map((salon, index) => (
-    <div key={index}>
-      <span className={`status-badge ${salon.status}`}>
-        {statusLabels[salon.status] || "Desconhecido"}
-      </span>
-    </div>
-  ))}
-  
-  
+  {
+    salons.map((salon, index) => (
+      <div key={index}>
+        <span className={`status-badge ${salon.status}`}>
+          {statusLabels[salon.status] || "Desconhecido"}
+        </span>
+      </div>
+    ));
+  }
+
   // Dados para gráficos
   const revenueChartData = {
     labels: dashboardData?.revenue_chart?.labels || [],
@@ -117,9 +118,14 @@ const Dashboard = () => {
         label: "Salões por Região",
         data: dashboardData?.salons_by_region?.data || [],
         backgroundColor: [
-          "rgba(99, 102, 241, 0.7)",
-          "rgba(16, 185, 129, 0.7)",
-          "rgba(245, 158, 11, 0.7)",
+          "rgba(99, 102, 241, 0.7)", // Azul
+          "rgba(16, 185, 129, 0.7)", // Verde
+          "rgba(245, 158, 11, 0.7)", // Laranja
+          "rgba(239, 68, 68, 0.7)", // Vermelho
+          "rgba(236, 72, 153, 0.7)", // Rosa
+          "rgba(59, 130, 246, 0.7)", // Azul Claro
+          "rgba(132, 204, 22, 0.7)", // Verde Limão
+          "rgba(168, 85, 247, 0.7)", // Roxo
         ],
         borderColor: "#fff",
         borderWidth: 1,
@@ -287,11 +293,11 @@ const Dashboard = () => {
                     <td>
                       <span className={`status-badge ${salon.status}`}>
                         {salon.status === "ativo"
-                          ? "Ativo"
+                          ? "Active"
                           : salon.status === "inativo"
-                          ? "Inativo"
+                          ? "Inactive"
                           : salon.status === "suspenso"
-                          ? "Suspenso"
+                          ? "Suspended"
                           : "Desconhecido"}
                       </span>
                     </td>
