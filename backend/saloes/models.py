@@ -7,7 +7,7 @@ class Salao(models.Model):
     STATUS_CHOICES = [
         ("ativo", "Ativo"),
         ("inativo", "Inativo"),
-        ("suspenso", "Suspenso")
+        ("suspenso", "Suspenso"),
     ]
 
     nome = models.CharField(max_length=100)
@@ -18,17 +18,10 @@ class Salao(models.Model):
     telefone = models.CharField(max_length=15)
     email = models.EmailField()
     data_cadastro = models.DateTimeField(default=timezone.now)
-
-    status = models.CharField(
-        max_length=20,  # Aumentado de 7 para 10 para garantir espaço
-        choices=STATUS_CHOICES,
-        default='ativo'
-    )
-
+    data_atualizacao = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="ativo")
     proprietario = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="saloes"
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="saloes"
     )
 
     clientes = models.ManyToManyField("clientes.Cliente", related_name="saloes_cliente")

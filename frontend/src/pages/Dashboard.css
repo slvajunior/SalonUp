@@ -41,9 +41,10 @@ main.content::-webkit-scrollbar {
   left: 50%;
   transform: translate(-50%, -50%);
   padding: 1rem;
-  width: 100%;
-  margin-top: 598px;
+  width: 98%;
+  margin-top: 518px;
   background-color: #f1f5f9;
+  border-radius: 2px;
 }
 
 /* Cabeçalho */
